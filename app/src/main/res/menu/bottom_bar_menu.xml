@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/cars_bottom_bar_button"
+        android:icon="@mipmap/ic_car_black_24dp"
+        android:title="@string/bottom_bar_cars" />
+
+    <item
+        android:id="@+id/sold_cars_bottom_bar_button"
+        android:icon="@mipmap/ic_cash_usd_black_24dp"
+        android:title="@string/bottom_bar_sold_cars" />
+
+    <item
+        android:id="@+id/all_cars_bottom_bar_button"
+        android:icon="@mipmap/ic_history_black_24dp"
+        android:title="@string/bottom_bar_all_cars" />
+
+</menu>

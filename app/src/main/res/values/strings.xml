@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_flash">Flash</string>
+
+    <!--Cars Strings-->
+    <string name="bottom_bar_cars">Cars</string>
+    <string name="no_cars">No Cars</string>
+    <string name="no_cars_image_view_content_description">
+        shown when no cars are in the cars fragment</string>
+
+    <!--Cars Sold Strings-->
+    <string name="bottom_bar_sold_cars">Sold</string>
+    <string name="no_sold_cars">No Cars</string>
+    <string name="no_sold_cars_image_view_content_description">
+        shown when no sold cars are in the sold cars fragment</string>
+
+    <!--History Strings-->
+    <string name="bottom_bar_all_cars">All</string>
+    <string name="no_all_cars">No Cars</string>
+    <string name="no_all_cars_image_view_content_description">
+        shown when no all cars is in the all cars fragment</string>
+
+    <!--Scanner Strings-->
+    <string name="navigation_scan">Scan</string>
+    <string name="scanner_instruction">Scan a barcode</string>
+
+</resources>
