@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.choch.michaeldicioccio.myapplication.OldMainActivity" >
+
+    <item android:id="@+id/action_move_to_cars"
+        android:title="Move"
+        android:icon="@mipmap/ic_car_white_24dp"
+        android:orderInCategory="99"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/action_delete"
+        android:title="Delete"
+        android:icon="@mipmap/ic_delete_white_24dp"
+        android:orderInCategory="100"
+        app:showAsAction="always" />
+
+</menu>

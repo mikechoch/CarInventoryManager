@@ -3,12 +3,12 @@
 
     <item
         android:id="@+id/cars_bottom_bar_button"
-        android:icon="@mipmap/ic_car_black_24dp"
+        android:icon="@mipmap/ic_car_white_24dp"
         android:title="@string/bottom_bar_cars" />
 
     <item
         android:id="@+id/sold_cars_bottom_bar_button"
-        android:icon="@mipmap/ic_cash_usd_black_24dp"
+        android:icon="@mipmap/ic_cash_usd_white_24dp"
         android:title="@string/bottom_bar_sold_cars" />
 
     <item

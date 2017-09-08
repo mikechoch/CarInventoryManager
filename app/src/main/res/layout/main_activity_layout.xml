@@ -1,60 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_coordinate_layout"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.choch.michaeldicioccio.myapplication.MainActivity">
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
 
-    <RelativeLayout
+    <include
+        layout="@layout/main_activity_app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/bottom_navigation_relative_layout"
-        android:layout_alignParentTop="true">
+        android:layout_height="match_parent" />
 
-        <com.choch.michaeldicioccio.myapplication.CustomLockableViewPager
-            android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="?attr/actionBarSize"/>
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:itemBackground="@drawable/drawer_menu_selector"
+        app:headerLayout="@layout/main_activity_nav_header"
+        app:menu="@menu/main_activity_drawer_menu" />
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/bottom_navigation_relative_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:gravity="bottom"
-        app:layout_behavior="com.choch.michaeldicioccio.myapplication.RelativeLayoutBehavior">
-
-        <android.support.design.widget.BottomNavigationView
-            android:id="@+id/bottom_navigation"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:background="@color/colorPrimary"
-            android:clickable="true"
-            app:elevation="8dp"
-            app:itemBackground="@color/colorPrimary"
-            app:itemIconTint="@drawable/bottom_navigation_color_selector"
-            app:itemTextColor="@drawable/bottom_navigation_color_selector"
-            app:menu="@menu/bottom_bar_menu" />
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/add_car_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_above="@id/bottom_navigation"
-            android:layout_margin="@dimen/fab_margin"
-            android:scaleType="center"
-            android:src="@mipmap/ic_plus_black_36dp"
-            android:tint="@color/colorPrimary"
-            app:elevation="8dp"/>
-
-    </RelativeLayout>
-
-</android.support.design.widget.CoordinatorLayout>
+</android.support.v4.widget.DrawerLayout>

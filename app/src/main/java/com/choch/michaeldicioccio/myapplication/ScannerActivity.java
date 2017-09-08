@@ -1,18 +1,17 @@
 package com.choch.michaeldicioccio.myapplication;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import io.realm.Realm;
+import io.realm.RealmObject;
 import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
@@ -20,6 +19,8 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView;
 public class ScannerActivity extends AppCompatActivity implements ZBarScannerView.ResultHandler {
 
     /* Attributes */
+    private Realm realm;
+
     private ZBarScannerView mScannerView;
 
     /**
@@ -77,6 +78,9 @@ public class ScannerActivity extends AppCompatActivity implements ZBarScannerVie
         super.onCreate(state);
         setContentView(R.layout.scanner_activity_layout); // Set the scanner view as the content view
 
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
+
         mScannerView = (ZBarScannerView) findViewById(R.id.scanner_view);
         RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.scanner_relative_layout);
 
@@ -124,15 +128,32 @@ public class ScannerActivity extends AppCompatActivity implements ZBarScannerVie
     @Override
     public void handleResult(Result rawResult) {
         // Do something with the result here
-        MainActivity.myVib.vibrate(50);
+        MainActivity.vibrator.vibrate(50);
+        final String vin = rawResult.getContents();
 
-        CarsFragment.customCarsRecyclerViewAdapter.add(rawResult.getContents());
-        AllCarsFragment.customAllCarsRecyclerViewAdapter.add(rawResult.getContents());
+        if (realm.where(Vehicle.class).equalTo("VIN", vin).findFirst() == null) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Vehicle vehicle = realm.createObject(Vehicle.class);
+                    vehicle.setVIN(vin);
+                    vehicle.setYear("2002");
+                    vehicle.setMake("Honda");
+                    vehicle.setModel("Civic");
+                    vehicle.setSold(false);
+                    realm.insert(vehicle);
+                }
+            });
 
-        MainActivity.checkArrayIsZeroDisplayZeroIcon(MainActivity.carInventoryVinNumberBarCodes.size(), CarsFragment.noCarsRelativeLayout);
-        MainActivity.checkArrayIsZeroDisplayZeroIcon(MainActivity.allVinNumberBarCodes.size(), AllCarsFragment.noAllCarsRelativeLayout);
+            setResult(ScannerActivity.RESULT_OK);
+            finish();
 
-        finish();
+        } else {
+            Toast toast = Toast.makeText(this, "VIN number already scanned", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.TOP, 0, 200);
+            toast.show();
+            mScannerView.resumeCameraPreview(this);
+        }
     }
 
     private Runnable task = new Runnable() {

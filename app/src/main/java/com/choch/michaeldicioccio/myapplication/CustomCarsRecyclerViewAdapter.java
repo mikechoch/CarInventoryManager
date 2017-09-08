@@ -1,26 +1,28 @@
 package com.choch.michaeldicioccio.myapplication;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bignerdranch.android.multiselector.MultiSelector;
-import com.bignerdranch.android.multiselector.SwappingHolder;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
 public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCarsRecyclerViewAdapter.MyViewHolder> {
 
-    Context context;
-    List<String> carsList;
-    
+    private Context context;
+    private ArrayList<Vehicle> carArrayList;
+    private RecyclerViewClickListener listener;
+    private SparseBooleanArray selectedItems;
+    private boolean actionModeEnabled = false;
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public View view;
         public TextView title;
@@ -34,10 +36,11 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
         }
     }
 
-
-    public CustomCarsRecyclerViewAdapter(Context context, List<String> carsList) {
+    public CustomCarsRecyclerViewAdapter(Context context, ArrayList<Vehicle> carArrayList, RecyclerViewClickListener listener) {
         this.context = context;
-        this.carsList = carsList;
+        this.carArrayList = carArrayList;
+        this.listener = listener;
+        selectedItems = new SparseBooleanArray();
     }
 
     @Override
@@ -50,20 +53,40 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        final String car = carsList.get(position);
-        holder.title.setText(car);
-        holder.mainRelativeLayout.setOnClickListener(new View.OnClickListener() {
+        final Vehicle vehicle = carArrayList.get(position);
+        holder.title.setText(vehicle.getVIN());
+
+        if (actionModeEnabled) {
+            holder.itemView.setSelected(selectedItems.get(position, false));
+            if (holder.itemView.isSelected()) {
+                holder.itemView.setBackgroundColor(Color.parseColor("#FFB300"));
+            } else {
+                holder.itemView.setBackgroundColor(Color.parseColor("#FFFFFF"));
+            }
+        } else {
+            holder.itemView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.car_item_selector));
+        }
+
+        // apply click events
+        applyClickEvents(holder, position);
+    }
+
+    private void applyClickEvents(final MyViewHolder holder, final int position) {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Toast.makeText(context, "Main View Clicked", Toast.LENGTH_SHORT).show();
+            public void onClick(View view) {
+                if (actionModeEnabled) {
+                    toggleSelection(position);
+                }
+                listener.onClick(view, position);
             }
         });
 
-        holder.mainRelativeLayout.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                MainActivity.myVib.vibrate(50);
-                Toast.makeText(context, "Main View Long Clicked", Toast.LENGTH_SHORT).show();
+            public boolean onLongClick(View view) {
+                toggleSelection(position);
+                listener.onLongClick(view, position);
                 return true;
             }
         });
@@ -71,27 +94,71 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
 
     @Override
     public int getItemCount() {
-        return carsList.size();
+        return carArrayList.size();
     }
 
-    public void add(String Vin) {
-        notifyItemInserted(carsList.size());
-        carsList.add(Vin);
+    public void toggleSelection(int position) {
+        if (selectedItems.get(position, false)) {
+            selectedItems.delete(position);
+        } else {
+            selectedItems.put(position, true);
+        }
+        notifyItemChanged(position);
     }
 
-    public void addAt(int position, String Vin) {
+    public void clearSelections() {
+        selectedItems.clear();
+        notifyDataSetChanged();
+    }
+
+    public int getSelectedItemCount() {
+        return selectedItems.size();
+    }
+
+    public List<Integer> getSelectedItems() {
+        List<Integer> items = new ArrayList<>(getSelectedItemCount());
+        for (int i = getSelectedItemCount() - 1; i > -1; i--) {
+            items.add(selectedItems.keyAt(i));
+        }
+        return items;
+    }
+
+    public void setActionMode(boolean actionMode) {
+        this.actionModeEnabled = actionMode;
+    }
+
+    public boolean isActionModeEnabled() {
+        return this.actionModeEnabled;
+    }
+
+    public void addAt(int position, Vehicle vehicle) {
+        carArrayList.add(position, vehicle);
         notifyItemInserted(position);
-        carsList.add(position, Vin);
-    }
 
-    public void removeLast() {
-        notifyItemRemoved(carsList.size()-1);
-        carsList.remove(carsList.size()-1);
+        for (int i = getSelectedItemCount() - 1; i > -1; i--) {
+            int key = selectedItems.keyAt(i);
+            if (key >= position) {
+                toggleSelection(key);
+                toggleSelection(key + 1);
+            }
+        }
     }
 
     public void removeAt(int position) {
+        carArrayList.remove(position);
         notifyItemRemoved(position);
-        carsList.remove(position);
+
+        if (selectedItems.get(position, false)) {
+            toggleSelection(position);
+        }
+
+        for (int i = 0; i < getSelectedItemCount(); i++) {
+            int key = selectedItems.keyAt(i);
+            if (key > position) {
+                toggleSelection(key);
+                toggleSelection(key - 1);
+            }
+        }
     }
 }
 

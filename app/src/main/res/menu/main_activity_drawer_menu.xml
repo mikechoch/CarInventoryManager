@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Add Car">
+        <menu>
+            <item
+                android:id="@+id/nav_type_car"
+                android:icon="@mipmap/ic_pencil_black_24dp"
+                android:title="Type VIN" />
+            <item
+                android:id="@+id/nav_scan_car"
+                android:icon="@mipmap/ic_barcode_scan_black_24dp"
+                android:title="Scan VIN" />
+        </menu>
+    </item>
+
+    <item android:title="Cars">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_inventory"
+                    android:icon="@mipmap/ic_car_white_24dp"
+                    android:title="Inventory" />
+                <item
+                    android:id="@+id/nav_sold_cars"
+                    android:icon="@mipmap/ic_cash_usd_white_24dp"
+                    android:title="Sold Cars" />
+                <item
+                    android:id="@+id/nav_all_cars"
+                    android:icon="@mipmap/ic_history_black_24dp"
+                    android:title="All Cars" />
+            </group>
+        </menu>
+    </item>
+
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@mipmap/ic_settings_black_24dp"
+            android:title="Settings" />
+    </group>
+
+</menu>

@@ -1,37 +1,178 @@
 package com.choch.michaeldicioccio.myapplication;
 
+import android.app.Fragment;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.support.annotation.Nullable;
+import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.ActionMode;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
-import com.bignerdranch.android.multiselector.MultiSelector;
+
+import java.util.ArrayList;
+
+import io.realm.Realm;
 
 
 public class CarsFragment extends Fragment {
 
     /* Attributes */
-    private MultiSelector mMultiSelector = new MultiSelector();
+    private Realm realm;
 
-    public static RecyclerView carsRecyclerView;
+    private ArrayList<Vehicle> carInventoryArrayList;
+
+    private RecyclerView carsRecyclerView;
+    private RelativeLayout noCarsRelativeLayout;
+
+    public static Toolbar toolbar;
+    public static DrawerLayout drawer;
+    public static ActionBarDrawerToggle toggle;
     public static CustomCarsRecyclerViewAdapter customCarsRecyclerViewAdapter;
-    public static RelativeLayout noCarsRelativeLayout;
 
     /* Constructor */
     public CarsFragment() {
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                return true;
+
+            case R.id.action_move_to_sold:
+                //alert for confirm to move
+                if (customCarsRecyclerViewAdapter.getSelectedItemCount() > 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    //set message
+                    builder.setMessage("Are you sure you want to move the selected cars?");
+
+                    //when click on MOVE
+                    builder.setPositiveButton("MOVE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int which) {
+                            customCarsRecyclerViewAdapter.setActionMode(false);
+                            realm.executeTransaction(new Realm.Transaction() {
+                                 @Override
+                                 public void execute(Realm realm) {
+                                     for (int position : customCarsRecyclerViewAdapter
+                                             .getSelectedItems()) {
+                                         realm.where(Vehicle.class).equalTo("sold", false).findAll()
+                                                 .get(position).setSold(true);
+                                         customCarsRecyclerViewAdapter.removeAt(position);
+                                     }
+                                 }
+                             });
+
+                            MainActivity.checkArrayIsZeroDisplayZeroIcon(
+                                    carInventoryArrayList.size(),
+                                    noCarsRelativeLayout);
+
+                            updateToolbarOnBackPressed(deactivateActionMode());
+                            dialogInterface.dismiss();
+                        }
+                        //not removing items if cancel is done
+                    }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int which) {
+                            dialogInterface.cancel();
+                        }
+                    }).setCancelable(false);
+
+                    final AlertDialog dialog = builder.create();
+                    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface dialogInterface) {
+                            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(
+                                    getResources().getColor(R.color.colorPrimary));
+                            dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(
+                                    Color.BLACK);
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    toast("Select cars to move");
+                }
+                return true;
+
+            case R.id.action_delete:
+                if (customCarsRecyclerViewAdapter.getSelectedItemCount() > 0) {
+                    //alert for confirm to delete
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    //set message
+                    builder.setMessage("Are you sure you want to delete the selected cars?");
+
+                    //when click on DELETE
+                    builder.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int which) {
+                            customCarsRecyclerViewAdapter.setActionMode(false);
+                            realm.executeTransaction(new Realm.Transaction() {
+                                @Override
+                                public void execute(Realm realm) {
+                                    for (int position : customCarsRecyclerViewAdapter
+                                            .getSelectedItems()) {
+                                        realm.where(Vehicle.class)
+                                                .equalTo("sold", false)
+                                                .findAll()
+                                                .deleteFromRealm(position);
+                                        customCarsRecyclerViewAdapter.removeAt(position);
+                                    }
+                                }
+                            });
+
+                            MainActivity.checkArrayIsZeroDisplayZeroIcon(
+                                    carInventoryArrayList.size(),
+                                    noCarsRelativeLayout);
+
+                            updateToolbarOnBackPressed(deactivateActionMode());
+                            dialogInterface.dismiss();
+                        }
+                        //not removing items if cancel is done
+                    }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int which) {
+                            dialogInterface.cancel();
+                        }
+                    }).setCancelable(false);
+
+                    final AlertDialog dialog = builder.create();
+                    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface dialogInterface) {
+                            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(
+                                    getResources().getColor(R.color.colorPrimary));
+
+                            dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(
+                                    Color.BLACK);
+                        }
+                    });
+                    dialog.show();
+                } else {
+                    toast("Select cars to delete");
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     /**
@@ -47,77 +188,95 @@ public class CarsFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.cars_fragment_layout, container, false);
 
+        toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+
+        Realm.init(getActivity());
+        realm = Realm.getDefaultInstance();
+        carInventoryArrayList = new ArrayList<>(realm.where(Vehicle.class).equalTo("sold", false)
+                .findAll());
+
         noCarsRelativeLayout = (RelativeLayout) view.findViewById(R.id.no_cars_relative_layout);
-        MainActivity.checkArrayIsZeroDisplayZeroIcon(MainActivity.carInventoryVinNumberBarCodes.size(), CarsFragment.noCarsRelativeLayout);
+        noCarsRelativeLayout.setVisibility(View.VISIBLE);
+        MainActivity.checkArrayIsZeroDisplayZeroIcon(
+                carInventoryArrayList.size(),
+                noCarsRelativeLayout);
 
         carsRecyclerView = (RecyclerView) view.findViewById(R.id.cars_recycler_view);
-        customCarsRecyclerViewAdapter = new CustomCarsRecyclerViewAdapter(getActivity(), MainActivity.carInventoryVinNumberBarCodes);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        customCarsRecyclerViewAdapter = new CustomCarsRecyclerViewAdapter(
+                getActivity(),
+                carInventoryArrayList,
+                new RecyclerViewClickListener() {
+                    @Override
+                    public void onClick(View view, int position) {
+                        checkedSelectedCount(false);
+                    }
+
+                    @Override
+                    public void onLongClick(View view, int position) {
+                        checkedSelectedCount(true);
+                    }
+                });
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+
         carsRecyclerView.setLayoutManager(mLayoutManager);
         carsRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(
+                0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            public boolean onMove(
+                    RecyclerView recyclerView,
+                    RecyclerView.ViewHolder viewHolder,
+                    RecyclerView.ViewHolder target) {
                 return false;
             }
 
             @Override
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
-                final int position = viewHolder.getAdapterPosition(); //get position which is swipe
+                final int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.LEFT | direction == ItemTouchHelper.RIGHT) {
-                    final String Vin = MainActivity.carInventoryVinNumberBarCodes.get(position);
+                    final String vin = carInventoryArrayList.get(position).getVIN();
+                    //TODO: update data on swipe
+                    final Vehicle[] vehicle = {new Vehicle()};
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            vehicle[0] = realm.where(Vehicle.class).equalTo("sold", false).findAll()
+                                    .get(position);
+                            realm.where(Vehicle.class).equalTo("sold", false).findAll().get(position)
+                                    .setSold(true);
+                            customCarsRecyclerViewAdapter.removeAt(position);
+                            checkedSelectedCount(false);
+                        }
+                    });
 
-                    CarsFragment.customCarsRecyclerViewAdapter.removeAt(position);
-                    CarsSoldFragment.customCarsSoldRecyclerViewAdapter.add(Vin);
-
-                    MainActivity.checkArrayIsZeroDisplayZeroIcon(MainActivity.carInventoryVinNumberBarCodes.size(), CarsFragment.noCarsRelativeLayout);
-                    MainActivity.checkArrayIsZeroDisplayZeroIcon(MainActivity.soldCarInventoryVinNumberBarCodes.size(), CarsSoldFragment.noCarsSoldRelativeLayout);
-
-                    CoordinatorLayout mainCoordinateLayout = (CoordinatorLayout) getActivity().findViewById(R.id.main_coordinate_layout);
-                    Snackbar.make(mainCoordinateLayout, Vin + " moved to Sold", Snackbar.LENGTH_SHORT)
+                    CoordinatorLayout mainCoordinateLayout =
+                            (CoordinatorLayout)
+                                    getActivity().findViewById(R.id.main_activity_container);
+                    Snackbar.make(mainCoordinateLayout, vin + " moved to Sold", Snackbar.LENGTH_SHORT)
                             .setAction("UNDO", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    CarsSoldFragment.customCarsSoldRecyclerViewAdapter.removeLast();
-                                    CarsFragment.customCarsRecyclerViewAdapter.addAt(position, Vin);
-
-                                    MainActivity.checkArrayIsZeroDisplayZeroIcon(MainActivity.carInventoryVinNumberBarCodes.size(), CarsFragment.noCarsRelativeLayout);
-                                    MainActivity.checkArrayIsZeroDisplayZeroIcon(MainActivity.soldCarInventoryVinNumberBarCodes.size(), CarsSoldFragment.noCarsSoldRelativeLayout);
+                                    //TODO: undo the swipe
+                                    realm.executeTransaction(new Realm.Transaction() {
+                                        @Override
+                                        public void execute(Realm realm) {
+                                            realm.where(Vehicle.class)
+                                                    .equalTo("sold", true)
+                                                    .equalTo("VIN", vehicle[0].getVIN())
+                                                    .findFirst()
+                                                    .setSold(false);
+                                            customCarsRecyclerViewAdapter.addAt(
+                                                    position,
+                                                    vehicle[0]);
+                                        }
+                                    });
                                 }
                             })
                             .setActionTextColor(getResources().getColor(R.color.colorPrimary))
                             .show();
-
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()); //alert for confirm to delete
-//                    builder.setMessage("Are you sure to delete?");    //set message
-//
-//                    builder.setPositiveButton("REMOVE", new DialogInterface.OnClickListener() { //when click on DELETE
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int which) {
-//                            customCarsRecyclerViewAdapter.notifyItemRemoved(position);    //item removed from recylcerview
-//                            MainActivity.soldCarInventoryVinNumberBarCodes.removeLast(position);  //then removeLast item
-//                            MainActivity.customFragmentPagerAdapter.notifyDataSetChanged();
-//                            dialogInterface.dismiss();
-//                        }
-//                    }).setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {  //not removing items if cancel is done
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int which) {
-//                            customCarsRecyclerViewAdapter.notifyItemRemoved(position + 1);    //notifies the RecyclerView Adapter that data in adapter has been removed at a particular position.
-//                            customCarsRecyclerViewAdapter.notifyItemRangeChanged(position, customCarsRecyclerViewAdapter.getItemCount());   //notifies the RecyclerView Adapter that positions of element in adapter has been changed from position(removed element index to end of list), please update it.
-//                            dialogInterface.cancel();
-//                        }
-//                    }).setCancelable(false);
-//
-//                    final AlertDialog dialog = builder.create();
-//                    dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-//                        @Override
-//                        public void onShow(DialogInterface dialogInterface) {
-//                            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorPrimary));
-//                            dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
-//                        }
-//                    });
-//                    dialog.show();
                 }
             }
         };
@@ -125,7 +284,66 @@ public class CarsFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(carsRecyclerView); //set swipe to recylcerview
 
         carsRecyclerView.setAdapter(customCarsRecyclerViewAdapter);
+        updateToolbarOnBackPressed(deactivateActionMode());
 
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        realm.close();
+    }
+
+    private void updateToolbarOnBackPressed(Toolbar toolbar) {
+        drawer = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+        toggle = new ActionBarDrawerToggle(
+                getActivity(),
+                drawer,
+                toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+    }
+
+    public static Toolbar deactivateActionMode() {
+        customCarsRecyclerViewAdapter.setActionMode(false);
+        customCarsRecyclerViewAdapter.clearSelections();
+        toolbar.getMenu().clear();
+        toolbar.setNavigationIcon(null);
+        toolbar.setTitle("Car Inventory");
+        toolbar.inflateMenu(R.menu.main_menu);
+
+        return toolbar;
+    }
+
+    public void activateActionMode() {
+        customCarsRecyclerViewAdapter.setActionMode(true);
+        toolbar.getMenu().clear();
+        toolbar.setTitle("");
+        toolbar.inflateMenu(R.menu.cars_action_menu);
+        toolbar.setNavigationIcon(R.mipmap.ic_arrow_left_white_24dp);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateToolbarOnBackPressed(deactivateActionMode());
+            }
+        });
+    }
+
+    private void checkedSelectedCount(boolean long_clicked) {
+        if (customCarsRecyclerViewAdapter.isActionModeEnabled()) {
+            if (customCarsRecyclerViewAdapter.getSelectedItemCount() == 0) {
+                updateToolbarOnBackPressed(deactivateActionMode());
+            }
+        } else {
+            if (long_clicked) {
+                activateActionMode();
+            }
+        }
+    }
+
+    private void toast(String toast_string) {
+        Toast.makeText(getActivity(), toast_string, Toast.LENGTH_SHORT).show();
     }
 }
