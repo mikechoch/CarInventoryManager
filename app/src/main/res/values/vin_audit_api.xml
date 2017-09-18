@@ -1,0 +1,5 @@
+<resources>
+    <!--TODO: Before you run your application, you need a VinAudit API key.-->
+
+    <string name="vin_audit_api" templateMergeStrategy="preserve" translatable="false">WTEW25Q5Q3QWFY1</string>
+</resources>

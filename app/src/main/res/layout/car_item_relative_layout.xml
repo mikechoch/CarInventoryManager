@@ -6,55 +6,81 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
-    android:padding="20dp"
-    android:elevation="5dp"
-    android:clickable="true"
-    android:longClickable="true"
-    android:focusable="true"
+    android:layout_marginBottom="8dp"
+    android:padding="16dp"
+    android:elevation="6dp"
     android:animateLayoutChanges="true"
     android:background="@drawable/car_item_selector">
 
     <TextView
-        android:id="@+id/text_view_1"
+        android:id="@+id/price_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:clickable="true"
+        android:longClickable="true"
+        android:focusable="true"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorIconNotActivated"/>
+
+    <TextView
+        android:id="@+id/price_profit_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@id/price_text_view"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorIconNotActivated"/>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/owned_status_card_view"
+        android:layout_width="50dp"
+        android:layout_height="16dp"
         android:layout_alignParentStart="true"
-        android:text="Year"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorIconNotActivated"/>
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="2dp"
+        app:cardElevation="0dp">
+
+        <RelativeLayout
+            android:id="@+id/owned_status_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:background="@color/colorIconNotActivated">
+
+            <TextView
+                android:id="@+id/owned_status_title_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorAccent"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
 
     <TextView
-        android:id="@+id/text_view_2"
+        android:id="@+id/year_make_model_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/text_view_1"
-        android:text=" Make"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:layout_below="@id/owned_status_card_view"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/price_text_view"
+        android:textSize="22sp"
         android:textColor="@color/colorIconNotActivated"/>
 
     <TextView
-        android:id="@+id/text_view_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/text_view_2"
-        android:text=" Model"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/colorIconNotActivated"/>
-
-    <TextView
-        android:id="@+id/car_item_title_text_view"
+        android:id="@+id/vin_edit_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/text_view_1"
-        android:textSize="20sp"
-        android:textStyle="bold"
+        android:layout_below="@id/year_make_model_text_view"
+        android:textSize="22sp"
         android:textColor="@color/colorIconNotActivated"/>
 
 </RelativeLayout>

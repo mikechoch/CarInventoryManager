@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/type_vin_coordinate_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    tools:context="com.choch.michaeldicioccio.myapplication.Activities.TypeVinActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <RelativeLayout
+        android:id="@+id/type_info_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?android:attr/actionBarSize"
+        android:gravity="top|start"
+        android:animateLayoutChanges="true">
+
+        <TextView
+            android:id="@+id/type_vin_title_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="6dp"
+            android:text="VIN Number:"
+            android:textColor="@color/colorIconNotActivated"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/type_vin_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/type_vin_title_text_view"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:hint=" VIN #"
+            android:textColorHint="@color/colorControlHighlight"
+            android:textSize="26sp"
+            android:maxLines="1"
+            android:maxLength="17"
+            android:textCursorDrawable="@drawable/type_vin_cursor" />
+
+        <TextView
+            android:id="@+id/type_price_title_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/type_vin_edit_text"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="6dp"
+            android:text="Price Paid:"
+            android:textColor="@color/colorIconNotActivated"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/dollar_sign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/type_price_title_text_view"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="4dp"
+            android:text="$"
+            android:textColor="@color/colorIconNotActivated"
+            android:textSize="26sp" />
+
+        <EditText
+            android:id="@+id/type_price_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/dollar_sign"
+            android:layout_below="@id/type_price_title_text_view"
+            android:layout_marginEnd="16dp"
+            android:hint="0.00"
+            android:textColorHint="@color/colorControlHighlight"
+            android:textSize="26sp"
+            android:maxLines="1"
+            android:maxLength="12"
+            android:textCursorDrawable="@drawable/type_vin_cursor" />
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/add_vehicle_button_container"
+            android:layout_below="@id/type_price_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:cardUseCompatPadding="true"
+            android:visibility="gone"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="4dp">
+
+            <RelativeLayout
+                android:id="@+id/add_vehicle_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/large_bar_button_selector">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_margin="10dp"
+                    android:text="Add"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorAccent"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/keyboard_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom">
+
+        <include layout="@layout/custom_keyboard_layout" />
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/progress_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:visibility="gone"
+        android:background="@color/colorTransparentBackground">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="100dp"
+            android:visibility="gone"/>
+
+    </FrameLayout>
+
+</android.support.design.widget.CoordinatorLayout>

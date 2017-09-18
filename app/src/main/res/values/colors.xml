@@ -8,4 +8,10 @@
     <color name="colorTextPrimary">#FFFFFF</color>
     <color name="colorIconNotActivated">#757575</color>
     <color name="colorScanner">#000000</color>
+    <color name="colorTransparentBackground">#64000000</color>
+
+    <color name="colorTextHighlight">#82ffb300</color>
+
+    <color name="colorValidVin">#4ac100</color>
+    <color name="colorInvalidVin">#ff2820</color>
 </resources>

@@ -1,7 +1,8 @@
-package com.choch.michaeldicioccio.myapplication;
+package com.choch.michaeldicioccio.myapplication.CarContainerFragments;
 
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,12 +13,20 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.choch.michaeldicioccio.myapplication.Activities.VehicleDetailActivity;
+import com.choch.michaeldicioccio.myapplication.CustomCarsRecyclerViewAdapter;
+import com.choch.michaeldicioccio.myapplication.Activities.MainActivity;
+import com.choch.michaeldicioccio.myapplication.R;
+import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
+import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
 
 import java.util.ArrayList;
 
@@ -146,7 +155,11 @@ public class AllCarsFragment extends Fragment {
                 new RecyclerViewClickListener() {
                     @Override
                     public void onClick(View view, int position) {
-                        checkedSelectedCount(false);
+                        if (!customAllCarsRecyclerViewAdapter.isActionModeEnabled()) {
+                            startVehicleDetailActivity(position);
+                        } else {
+                            checkedSelectedCount(false);
+                        }
                     }
 
                     @Override
@@ -220,7 +233,13 @@ public class AllCarsFragment extends Fragment {
         }
     }
 
+    private void startVehicleDetailActivity(int position) {
+        Intent vehicleDetailIntent = new Intent(getActivity().getApplicationContext(), VehicleDetailActivity.class);
+        vehicleDetailIntent.putExtra("Vin", allCarsArrayList.get(position).getVin());
+        startActivity(vehicleDetailIntent);
+    }
+
     private void toast(String toast_string) {
-        Toast.makeText(getActivity(), toast_string, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), Html.fromHtml("<b>" + toast_string + "</b>"), Toast.LENGTH_SHORT).show();
     }
 }

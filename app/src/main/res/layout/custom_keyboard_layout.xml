@@ -1,0 +1,1408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/keyboard_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:animateLayoutChanges="true">
+
+    <RelativeLayout
+        android:id="@+id/alpha_numeric_keyboard_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:elevation="10dp"
+        android:clipToPadding="false"
+        android:background="@color/colorMainBackground">
+
+        <TableRow
+            android:id="@+id/number_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="32dp">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_1"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_1_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_2"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_2_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_3"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_3_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_4"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_4_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_5"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_5_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="5"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_6"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_6_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="6"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_7"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_7_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="7"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_8"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_8_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="8"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_9"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_9_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="9"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_0"
+                    android:layout_width="30dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/key_0_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/alpha_row_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_below="@id/number_row">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_Q"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Q"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_W"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="W"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_E"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="E"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_R"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="R"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_T"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="T"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_Y"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Y"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_U"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="U"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_I"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="I"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_O"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="O"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_P"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="P"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/alpha_row_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_below="@id/alpha_row_1">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_A"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="A"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_S"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="S"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_D"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="D"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_F"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="F"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_G"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="G"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_H"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="H"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_J"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="J"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_K"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="K"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_L"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="L"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/alpha_row_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="8dp"
+            android:layout_below="@id/alpha_row_2">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_Z"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Z"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_X"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="X"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_C"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="C"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_V"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="V"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_B"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="B"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_N"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="N"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/key_M"
+                    android:layout_width="30dp"
+                    android:layout_height="42dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="M"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </TableRow>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_below="@id/alpha_row_2"
+            android:layout_toEndOf="@id/alpha_row_3">
+
+            <RelativeLayout
+                android:id="@+id/key_backspace"
+                android:layout_width="50dp"
+                android:layout_height="42dp"
+                android:background="@drawable/keyboard_item_selector">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/backspace"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/currency_keyboard_relative_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:elevation="10dp"
+        android:clipToPadding="false"
+        android:background="@color/colorMainBackground">
+
+        <TableRow
+            android:id="@+id/numeric_top_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="32dp">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_1"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_1_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_2"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_2_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_3"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_3_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="3"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/numeric_middle_row_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/numeric_top_row">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_4"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_4_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_5"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_5_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="5"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_6"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_6_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="6"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/numeric_middle_row_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/numeric_middle_row_1">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_7"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_7_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="7"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_8"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_8_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="8"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_9"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_9_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="9"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/numeric_bottom_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginBottom="8dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/numeric_middle_row_2">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_dot"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_dot_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="."
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_0"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <TextView
+                        android:id="@+id/currency_key_0_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="20sp"
+                        android:textAlignment="center"
+                        android:layout_centerInParent="true"
+                        android:textColor="@color/colorIconNotActivated"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+            <android.support.v7.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <RelativeLayout
+                    android:id="@+id/currency_key_backspace"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/keyboard_item_selector">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/backspace"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </TableRow>
+
+    </RelativeLayout>
+
+</RelativeLayout>

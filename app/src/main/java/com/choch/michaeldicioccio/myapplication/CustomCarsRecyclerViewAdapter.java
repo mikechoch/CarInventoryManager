@@ -2,7 +2,10 @@ package com.choch.michaeldicioccio.myapplication;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.speech.tts.TextToSpeech;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +13,10 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
+
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -23,16 +28,28 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
     private SparseBooleanArray selectedItems;
     private boolean actionModeEnabled = false;
 
+    private DecimalFormat df = new DecimalFormat(Defaults.DOUBLE_FORMAT.getObject().toString());
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public View view;
-        public TextView title;
-        public RelativeLayout mainRelativeLayout;
+        public TextView itemTitleTextView;
+        public TextView itemVinTetxView;
+        public TextView itemOwnedStatusTextView;
+        public RelativeLayout itemOwnedStatusRelativeLayout;
+        public TextView itemPriceTextView;
+        public TextView itemProfitTextView;
+        public RelativeLayout itemRelativeLayout;
 
         public MyViewHolder(View view) {
             super(view);
             this.view = view;
-            title = (TextView) view.findViewById(R.id.car_item_title_text_view);
-            mainRelativeLayout = (RelativeLayout) view.findViewById(R.id.car_item_relative_layout);
+            itemTitleTextView = (TextView) view.findViewById(R.id.year_make_model_text_view);
+            itemVinTetxView = (TextView) view.findViewById(R.id.vin_edit_text);
+            itemOwnedStatusTextView = (TextView) view.findViewById(R.id.owned_status_title_view);
+            itemOwnedStatusRelativeLayout = (RelativeLayout) view.findViewById(R.id.owned_status_relative_layout);
+            itemPriceTextView = (TextView) view.findViewById(R.id.price_text_view);
+            itemProfitTextView  =(TextView) view.findViewById(R.id.price_profit_text_view);
+            itemRelativeLayout = (RelativeLayout) view.findViewById(R.id.car_item_relative_layout);
         }
     }
 
@@ -54,7 +71,42 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final Vehicle vehicle = carArrayList.get(position);
-        holder.title.setText(vehicle.getVIN());
+        holder.itemTitleTextView.setText(vehicle.getYear() + " "
+                + vehicle.getMake() + " "
+                + vehicle.getModel());
+        holder.itemVinTetxView.setText(vehicle.getVin());
+        if (vehicle.isSold()) {
+            holder.itemOwnedStatusTextView.setText("Sold");
+            if (vehicle.hasSoldPriceBeenSetBefore()) {
+                holder.itemOwnedStatusRelativeLayout.setBackgroundColor(context.getResources().getColor(R.color.colorIconNotActivated));
+                String[] price_sold = df.format(vehicle.getPriceSold()).split("\\.");
+                holder.itemPriceTextView.setText(Html.fromHtml("$" + price_sold[0] + "<small><small>" + "." + price_sold[1] + "</small></small>"));
+                holder.itemPriceTextView.setTextColor(context.getResources().getColor(R.color.colorIconNotActivated));
+                holder.itemPriceTextView.setTextSize(18);
+
+                Double profit = vehicle.getPriceSold() - vehicle.getPricePaid();
+                String[] price_profit = df.format(Math.abs(profit)).split("\\.");
+                holder.itemProfitTextView.setText(Html.fromHtml("$" + price_profit[0] + "<small><small>" + "." + price_profit[1] + "</small></small>"));
+                if (profit < 0) {
+                    holder.itemProfitTextView.setTextColor(context.getResources().getColor(R.color.colorInvalidVin));
+                } else {
+                    holder.itemProfitTextView.setTextColor(context.getResources().getColor(R.color.colorValidVin));
+                }
+            } else {
+                holder.itemPriceTextView.setText("Add Price Sold");
+                holder.itemPriceTextView.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+                holder.itemPriceTextView.setTextSize(15);
+
+                holder.itemProfitTextView.setText("");
+            }
+
+        } else {
+            holder.itemOwnedStatusTextView.setText("Owned");
+            holder.itemOwnedStatusRelativeLayout.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+            String[] price = df.format(vehicle.getPricePaid()).split("\\.");
+            holder.itemPriceTextView.setText(Html.fromHtml("$" + price[0] + "<small><small>" + "." + price[1] + "</small></small>"));
+
+        }
 
         if (actionModeEnabled) {
             holder.itemView.setSelected(selectedItems.get(position, false));

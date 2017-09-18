@@ -5,14 +5,15 @@
     android:layout_height="match_parent"
     android:background="@color/colorMainBackground"
     android:fitsSystemWindows="true"
-    tools:context="com.choch.michaeldicioccio.myapplication.AllCarsFragment">
+    tools:context="com.choch.michaeldicioccio.myapplication.CarContainerFragments.AllCarsFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/all_cars_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="104dp"
+        android:clipToPadding="false"
         android:background="@color/colorMainBackground">
 
     </android.support.v7.widget.RecyclerView>

@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    tools:openDrawer="start"
+    tools:context="com.choch.michaeldicioccio.myapplication.Activities.MainActivity">
 
     <include
         layout="@layout/main_activity_app_bar"

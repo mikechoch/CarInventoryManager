@@ -1,10 +1,13 @@
-package com.choch.michaeldicioccio.myapplication;
+package com.choch.michaeldicioccio.myapplication.CarContainerFragments;
 
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
@@ -15,13 +18,23 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+
+import com.choch.michaeldicioccio.myapplication.Activities.VehicleDetailActivity;
+import com.choch.michaeldicioccio.myapplication.CustomCarsRecyclerViewAdapter;
+import com.choch.michaeldicioccio.myapplication.Activities.MainActivity;
+import com.choch.michaeldicioccio.myapplication.R;
+import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
+import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
 
 import java.util.ArrayList;
 
@@ -37,6 +50,9 @@ public class CarsFragment extends Fragment {
 
     private RecyclerView carsRecyclerView;
     private RelativeLayout noCarsRelativeLayout;
+
+    private ProgressBar progressBar;
+    private FrameLayout frameLayout;
 
     public static Toolbar toolbar;
     public static DrawerLayout drawer;
@@ -208,7 +224,11 @@ public class CarsFragment extends Fragment {
                 new RecyclerViewClickListener() {
                     @Override
                     public void onClick(View view, int position) {
-                        checkedSelectedCount(false);
+                        if (!customCarsRecyclerViewAdapter.isActionModeEnabled()) {
+                            startVehicleDetailActivity(position);
+                        } else {
+                            checkedSelectedCount(false);
+                        }
                     }
 
                     @Override
@@ -237,7 +257,7 @@ public class CarsFragment extends Fragment {
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.LEFT | direction == ItemTouchHelper.RIGHT) {
-                    final String vin = carInventoryArrayList.get(position).getVIN();
+                    final String vin = carInventoryArrayList.get(position).getVin();
                     //TODO: update data on swipe
                     final Vehicle[] vehicle = {new Vehicle()};
                     realm.executeTransaction(new Realm.Transaction() {
@@ -247,32 +267,44 @@ public class CarsFragment extends Fragment {
                                     .get(position);
                             realm.where(Vehicle.class).equalTo("sold", false).findAll().get(position)
                                     .setSold(true);
+
                             customCarsRecyclerViewAdapter.removeAt(position);
                             checkedSelectedCount(false);
                         }
                     });
 
+                    MainActivity.checkArrayIsZeroDisplayZeroIcon(
+                            carInventoryArrayList.size(),
+                            noCarsRelativeLayout);
+
                     CoordinatorLayout mainCoordinateLayout =
                             (CoordinatorLayout)
                                     getActivity().findViewById(R.id.main_activity_container);
-                    Snackbar.make(mainCoordinateLayout, vin + " moved to Sold", Snackbar.LENGTH_SHORT)
+                    String vehicle_string = vehicle[0].getYear() + " "
+                            + vehicle[0].getMake() + " "
+                            + vehicle[0].getModel();
+                    Snackbar.make(mainCoordinateLayout, vehicle_string + " moved to Sold", Snackbar.LENGTH_SHORT)
                             .setAction("UNDO", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    //TODO: undo the swipe
                                     realm.executeTransaction(new Realm.Transaction() {
                                         @Override
                                         public void execute(Realm realm) {
                                             realm.where(Vehicle.class)
                                                     .equalTo("sold", true)
-                                                    .equalTo("VIN", vehicle[0].getVIN())
+                                                    .equalTo("Vin", vehicle[0].getVin())
                                                     .findFirst()
                                                     .setSold(false);
+
                                             customCarsRecyclerViewAdapter.addAt(
                                                     position,
                                                     vehicle[0]);
                                         }
                                     });
+
+                                    MainActivity.checkArrayIsZeroDisplayZeroIcon(
+                                            carInventoryArrayList.size(),
+                                            noCarsRelativeLayout);
                                 }
                             })
                             .setActionTextColor(getResources().getColor(R.color.colorPrimary))
@@ -343,7 +375,13 @@ public class CarsFragment extends Fragment {
         }
     }
 
+    private void startVehicleDetailActivity(int position) {
+        Intent vehicleDetailIntent = new Intent(getActivity().getApplicationContext(), VehicleDetailActivity.class);
+        vehicleDetailIntent.putExtra("Vin", carInventoryArrayList.get(position).getVin());
+        startActivity(vehicleDetailIntent);
+    }
+
     private void toast(String toast_string) {
-        Toast.makeText(getActivity(), toast_string, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), Html.fromHtml("<b>" + toast_string + "</b>"), Toast.LENGTH_SHORT).show();
     }
 }

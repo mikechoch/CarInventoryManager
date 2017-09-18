@@ -6,11 +6,11 @@
             <item
                 android:id="@+id/nav_type_car"
                 android:icon="@mipmap/ic_pencil_black_24dp"
-                android:title="Type VIN" />
+                android:title="Type Vin #" />
             <item
                 android:id="@+id/nav_scan_car"
                 android:icon="@mipmap/ic_barcode_scan_black_24dp"
-                android:title="Scan VIN" />
+                android:title="Scan Vin #" />
         </menu>
     </item>
 
