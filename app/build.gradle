@@ -44,7 +44,6 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'me.dm7.barcodescanner:zxing:1.9.8'
     compile 'me.dm7.barcodescanner:zbar:1.9.8'
-    compile 'com.bignerdranch.android:recyclerview-multiselect:0.2'
     compile 'com.github.clans:fab:1.6.4'
 
     testCompile 'junit:junit:4.12'

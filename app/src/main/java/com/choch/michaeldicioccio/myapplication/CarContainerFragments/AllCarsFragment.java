@@ -22,7 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.choch.michaeldicioccio.myapplication.Activities.VehicleDetailActivity;
-import com.choch.michaeldicioccio.myapplication.CustomCarsRecyclerViewAdapter;
+import com.choch.michaeldicioccio.myapplication.Vehicle.CustomCarsRecyclerViewAdapter;
 import com.choch.michaeldicioccio.myapplication.Activities.MainActivity;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;

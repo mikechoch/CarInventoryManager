@@ -56,6 +56,14 @@
         </activity>
 
         <activity
+            android:name=".Activities.ExpenseDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity
             android:name=".Activities.SettingsActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait">

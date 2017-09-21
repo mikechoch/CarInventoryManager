@@ -1,18 +1,24 @@
 package com.choch.michaeldicioccio.myapplication.Activities;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Html;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,52 +26,42 @@ import android.widget.Toast;
 
 import com.choch.michaeldicioccio.myapplication.Defaults;
 import com.choch.michaeldicioccio.myapplication.R;
+import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
+import com.choch.michaeldicioccio.myapplication.Vehicle.CustomExpensesRecyclerViewAdapter;
+import com.choch.michaeldicioccio.myapplication.Vehicle.Expense;
 import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 import io.realm.Realm;
 
-/**
- * Created by michaeldicioccio on 9/14/17.
- */
 
 public class VehicleDetailActivity extends AppCompatActivity {
 
     private Realm realm;
     private boolean editModeEnabled = false;
     private String toolbarTitle;
+    private DecimalFormat df = new DecimalFormat(Defaults.DOUBLE_FORMAT.getObject().toString());
+
+    private ArrayList<Expense> expensesArrayList;
+    private RecyclerView swipeExpensesRecyclerView, noSwipeExpensesRecyclerView;
+    private CustomExpensesRecyclerViewAdapter
+            customSwipeExpensesRecyclerViewAdapter, customNoSwipeExpensesRecyclerViewAdapter;
 
     private Vehicle vehicle;
 
+    private Toolbar toolbar;
+    private TextView noExpensesTextView;
+    private EditText
+            vinEditText, yearEditText, makeEditText, modelEditText, trimEditText, styleEditText,
+            engineEditText, pricePaidEditText, priceSoldEditText, descriptionEditText;
+    private CardView addExpenseButtonCardView, saveVehicleButtonCardView;
+    private RelativeLayout addExpenseButtonRelativeLayout, saveVehicleButtonRelativeLayout;
+    private LinearLayout dummyLinearLayout;
     private ProgressBar progressBar;
     private FrameLayout frameLayout;
 
-    private Toolbar toolbar;
-    
-    private TextView pricePaidLabelTextView;
-    private TextView priceSoldLabelTextView;
-
-    private EditText vinEditText;
-    private EditText yearEditText;
-    private EditText makeEditText;
-    private EditText modelEditText;
-    private EditText trimEditText;
-    private EditText styleEditText;
-    private EditText engineEditText;
-
-    private EditText pricePaidEditText;
-    private EditText priceSoldEditText;
-
-    private EditText descriptionEditText;
-
-    private CardView saveVehicleButton;
-    private RelativeLayout saveVehicleRelativeLayout;
-    private CardView savReturnVehicleButton;
-    private RelativeLayout saveReturnVehicleRelativeLayout;
-
-    private DecimalFormat df = new DecimalFormat(Defaults.DOUBLE_FORMAT.getObject().toString());
-    private boolean return_main = false;
 
     /**
      * inflates the menu for the current activity
@@ -74,7 +70,6 @@ public class VehicleDetailActivity extends AppCompatActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.vehicle_detail_menu, menu);
         return true;
     }
@@ -86,28 +81,15 @@ public class VehicleDetailActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         if (id == R.id.action_edit) {
             activateEditMode();
             return true;
+
         } else if (id == R.id.action_save) {
-            String[] strings = {
-                    vinEditText.getText().toString(),
-                    yearEditText.getText().toString(),
-                    makeEditText.getText().toString(),
-                    modelEditText.getText().toString(),
-                    trimEditText.getText().toString(),
-                    styleEditText.getText().toString(),
-                    engineEditText.getText().toString(),
-                    descriptionEditText.getText().toString(),
-                    pricePaidEditText.getText().toString(),
-                    priceSoldEditText.getText().toString()};
-            new EditInfoTask().execute(strings);
+            new EditInfoTask().execute(getEditTextStrings());
             return true;
+
         } else if (id == android.R.id.home) {
             if (editModeEnabled) {
                 deactivateEditMode();
@@ -115,6 +97,7 @@ public class VehicleDetailActivity extends AppCompatActivity {
                 finish();
             }
             return true;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -128,6 +111,12 @@ public class VehicleDetailActivity extends AppCompatActivity {
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
+        final Expense expense = new Expense();
+        expense.setTitle("Expense");
+        expense.setPrice(300);
+        expense.setDescription("This is a description");
+        expensesArrayList = new ArrayList<>();
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -135,14 +124,9 @@ public class VehicleDetailActivity extends AppCompatActivity {
         if (getIntent().getStringExtra("Vin") != null) {
             vehicle = realm.where(Vehicle.class).equalTo("Vin", getIntent().getStringExtra("Vin")).findFirst();
             toolbarTitle = vehicle.getYear() + " " + vehicle.getMake() + " " + vehicle.getModel();
+            expensesArrayList = vehicle.getExpenses();
             getSupportActionBar().setTitle(toolbarTitle);
         }
-
-        pricePaidLabelTextView = (TextView) findViewById(R.id.price_paid_title_text_view);
-        priceSoldLabelTextView = (TextView) findViewById(R.id.price_sold_title_text_view);
-
-        pricePaidLabelTextView.setText(Html.fromHtml("<b>Price paid:</b> <big>$</big>"));
-        priceSoldLabelTextView.setText(Html.fromHtml("<b>Price sold:</b> <big>$</big>"));
 
         vinEditText = (EditText) findViewById(R.id.vin_edit_text);
         yearEditText = (EditText) findViewById(R.id.year_edit_text);
@@ -174,59 +158,168 @@ public class VehicleDetailActivity extends AppCompatActivity {
         styleEditText.setText(vehicle.getStyle());
         engineEditText.setText(vehicle.getEngine());
         descriptionEditText.setText(vehicle.getDescription());
-        pricePaidEditText.setText(df.format(vehicle.getPricePaid()));
+
+        if (vehicle.hasPaidPriceBeenSetBefore()) {
+            pricePaidEditText.setText(df.format(vehicle.getPricePaid()));
+        } else {
+            pricePaidEditText.setText("");
+        }
+
         if (vehicle.hasSoldPriceBeenSetBefore()) {
             priceSoldEditText.setText(df.format(vehicle.getPriceSold()));
         } else {
             priceSoldEditText.setText("");
         }
 
-        saveVehicleButton = (CardView) findViewById(R.id.save_vehicle_button_container);
-        saveVehicleRelativeLayout = (RelativeLayout) findViewById(R.id.save_vehicle_button);
-        saveVehicleRelativeLayout.setOnClickListener(new View.OnClickListener() {
+        addExpenseButtonCardView = (CardView) findViewById(R.id.add_expense_button_container);
+        addExpenseButtonRelativeLayout = (RelativeLayout) findViewById(R.id.add_expense_button);
+        addExpenseButtonRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (editModeEnabled) {
-                    String[] strings = {
-                            vinEditText.getText().toString(),
-                            yearEditText.getText().toString(),
-                            makeEditText.getText().toString(),
-                            modelEditText.getText().toString(),
-                            trimEditText.getText().toString(),
-                            styleEditText.getText().toString(),
-                            engineEditText.getText().toString(),
-                            descriptionEditText.getText().toString(),
-                            pricePaidEditText.getText().toString(),
-                            priceSoldEditText.getText().toString()};
-                    new EditInfoTask().execute(strings);
+                customSwipeExpensesRecyclerViewAdapter.addAt(expensesArrayList.size(), expense);
+
+                if (expensesArrayList.size() > 0) {
+                    noExpensesTextView.setVisibility(View.GONE);
+                    if (editModeEnabled) {
+                        swipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                        noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+                    } else {
+                        swipeExpensesRecyclerView.setVisibility(View.GONE);
+                        noSwipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    noExpensesTextView.setVisibility(View.VISIBLE);
+                    swipeExpensesRecyclerView.setVisibility(View.GONE);
+                    noSwipeExpensesRecyclerView.setVisibility(View.GONE);
                 }
             }
         });
 
-        savReturnVehicleButton = (CardView) findViewById(R.id.save_return_vehicle_button_container);
-        saveReturnVehicleRelativeLayout = (RelativeLayout) findViewById(R.id.save_return_vehicle_button);
-        saveReturnVehicleRelativeLayout.setOnClickListener(new View.OnClickListener() {
+        saveVehicleButtonCardView = (CardView) findViewById(R.id.save_vehicle_button_container);
+        saveVehicleButtonRelativeLayout = (RelativeLayout) findViewById(R.id.save_vehicle_button);
+        saveVehicleButtonRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (editModeEnabled) {
-                    String[] strings = {
-                            vinEditText.getText().toString(),
-                            yearEditText.getText().toString(),
-                            makeEditText.getText().toString(),
-                            modelEditText.getText().toString(),
-                            trimEditText.getText().toString(),
-                            styleEditText.getText().toString(),
-                            engineEditText.getText().toString(),
-                            descriptionEditText.getText().toString(),
-                            pricePaidEditText.getText().toString(),
-                            priceSoldEditText.getText().toString()};
-                    return_main = true;
-                    new EditInfoTask().execute(strings);
+                    new EditInfoTask().execute(getEditTextStrings());
                 }
             }
         });
 
+        swipeExpensesRecyclerView = (RecyclerView) findViewById(R.id.swipe_expenses_recycler_view);
+        customSwipeExpensesRecyclerViewAdapter = new CustomExpensesRecyclerViewAdapter(
+                this,
+                expensesArrayList,
+                new RecyclerViewClickListener() {
+                    @Override
+                    public void onClick(View view, int position) {
 
+                    }
+
+                    @Override
+                    public void onLongClick(View view, int position) {
+
+                    }
+                });
+
+        RecyclerView.LayoutManager layoutManager1 = new LinearLayoutManager(this);
+
+        swipeExpensesRecyclerView.setLayoutManager(layoutManager1);
+        swipeExpensesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(
+                0,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(
+                    RecyclerView recyclerView,
+                    RecyclerView.ViewHolder viewHolder,
+                    RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
+                final int position = viewHolder.getAdapterPosition();
+                if (direction == ItemTouchHelper.LEFT | direction == ItemTouchHelper.RIGHT) {
+                    final Expense expense = expensesArrayList.get(position);
+                    customSwipeExpensesRecyclerViewAdapter.removeAt(position);
+
+                    if (expensesArrayList.size() > 0) {
+                        swipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                        noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+                    } else {
+                        swipeExpensesRecyclerView.setVisibility(View.GONE);
+                        noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+                    }
+
+                    CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.vehicle_detail_coordinate_layout);
+                    Snackbar.make(coordinatorLayout, "Deleted " + expense.getTitle(), Snackbar.LENGTH_SHORT)
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    customSwipeExpensesRecyclerViewAdapter.addAt(position, expense);
+
+                                    if (expensesArrayList.size() > 0) {
+                                        swipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                                        noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+                                    } else {
+                                        swipeExpensesRecyclerView.setVisibility(View.GONE);
+                                        noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+                                    }
+                                }
+                            })
+                            .setActionTextColor(getResources().getColor(R.color.colorPrimary))
+                            .show();
+                }
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(swipeExpensesRecyclerView); //set swipe to recylcerview
+
+        swipeExpensesRecyclerView.setAdapter(customSwipeExpensesRecyclerViewAdapter);
+
+        noSwipeExpensesRecyclerView = (RecyclerView) findViewById(R.id.no_swipe_expenses_recycler_view);
+        customNoSwipeExpensesRecyclerViewAdapter = new CustomExpensesRecyclerViewAdapter(
+                this,
+                expensesArrayList,
+                new RecyclerViewClickListener() {
+                    @Override
+                    public void onClick(View view, int position) {
+                        startExpenseDetailActivity(position);
+                    }
+
+                    @Override
+                    public void onLongClick(View view, int position) {
+
+                    }
+                });
+
+        RecyclerView.LayoutManager layoutManager2 = new LinearLayoutManager(this);
+
+        noSwipeExpensesRecyclerView.setLayoutManager(layoutManager2);
+        noSwipeExpensesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        noSwipeExpensesRecyclerView.setAdapter(customNoSwipeExpensesRecyclerViewAdapter);
+
+        noExpensesTextView = (TextView) findViewById(R.id.no_expenses_text_view);
+        if (expensesArrayList.size() > 0) {
+            noExpensesTextView.setVisibility(View.GONE);
+            if (editModeEnabled) {
+                swipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+            } else {
+                swipeExpensesRecyclerView.setVisibility(View.GONE);
+                noSwipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+            }
+        } else {
+            noExpensesTextView.setVisibility(View.VISIBLE);
+            swipeExpensesRecyclerView.setVisibility(View.GONE);
+            noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+        }
+
+        dummyLinearLayout = (LinearLayout) findViewById(R.id.dummy_layout);
+        dummyLinearLayout.requestFocus();
     }
 
     /**
@@ -244,9 +337,8 @@ public class VehicleDetailActivity extends AppCompatActivity {
     public void deactivateEditMode() {
         editModeEnabled = false;
         toggleEditTextEditable();
-        saveVehicleButton.setVisibility(View.GONE);
-        savReturnVehicleButton.setVisibility(View.GONE);
         toolbar.getMenu().clear();
+
         vinEditText.setText(vehicle.getVin());
         yearEditText.setText(vehicle.getYear());
         makeEditText.setText(vehicle.getMake());
@@ -256,11 +348,19 @@ public class VehicleDetailActivity extends AppCompatActivity {
         engineEditText.setText(vehicle.getEngine());
         descriptionEditText.setText(vehicle.getDescription());
         pricePaidEditText.setText(df.format(vehicle.getPricePaid()));
+
+        if (vehicle.hasPaidPriceBeenSetBefore()) {
+            pricePaidEditText.setText(df.format(vehicle.getPricePaid()));
+        } else {
+            pricePaidEditText.setText("");
+        }
+
         if (vehicle.hasSoldPriceBeenSetBefore()) {
             priceSoldEditText.setText(df.format(vehicle.getPriceSold()));
         } else {
             priceSoldEditText.setText("");
         }
+
         toolbarTitle = vehicle.getYear() + " " + vehicle.getMake() + " " + vehicle.getModel();
         toolbar.setTitle(toolbarTitle);
         toolbar.inflateMenu(R.menu.vehicle_detail_menu);
@@ -270,8 +370,6 @@ public class VehicleDetailActivity extends AppCompatActivity {
     private void activateEditMode() {
         editModeEnabled = true;
         toggleEditTextEditable();
-        saveVehicleButton.setVisibility(View.VISIBLE);
-        savReturnVehicleButton.setVisibility(View.VISIBLE);
         toolbar.getMenu().clear();
         toolbar.setTitle("Edit: " + toolbarTitle);
         toolbar.inflateMenu(R.menu.vehicle_detail_edit_mode_menu);
@@ -291,6 +389,17 @@ public class VehicleDetailActivity extends AppCompatActivity {
             descriptionEditText.setEnabled(true);
             pricePaidEditText.setEnabled(true);
             priceSoldEditText.setEnabled(true);
+            addExpenseButtonCardView.setVisibility(View.VISIBLE);
+            saveVehicleButtonCardView.setVisibility(View.VISIBLE);
+
+            noExpensesTextView.setVisibility(View.GONE);
+            if (expensesArrayList.size() > 0) {
+                swipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+            } else {
+                swipeExpensesRecyclerView.setVisibility(View.GONE);
+                noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+            }
         } else {
             vinEditText.setEnabled(false);
             yearEditText.setEnabled(false);
@@ -302,7 +411,48 @@ public class VehicleDetailActivity extends AppCompatActivity {
             descriptionEditText.setEnabled(false);
             pricePaidEditText.setEnabled(false);
             priceSoldEditText.setEnabled(false);
+            addExpenseButtonCardView.setVisibility(View.GONE);
+            saveVehicleButtonCardView.setVisibility(View.GONE);
+
+            if (vehicle.getExpenses().size() != expensesArrayList.size()) {
+                toast("NOPE");
+            }
+
+            if (expensesArrayList.size() > 0) {
+                noExpensesTextView.setVisibility(View.GONE);
+                swipeExpensesRecyclerView.setVisibility(View.GONE);
+                noSwipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+            } else {
+                noExpensesTextView.setVisibility(View.VISIBLE);
+                swipeExpensesRecyclerView.setVisibility(View.GONE);
+                noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+            }
+
+            dummyLinearLayout.requestFocus();
         }
+    }
+
+    private String[] getEditTextStrings() {
+        String[] strings = {
+                vinEditText.getText().toString(),
+                yearEditText.getText().toString(),
+                makeEditText.getText().toString(),
+                modelEditText.getText().toString(),
+                trimEditText.getText().toString(),
+                styleEditText.getText().toString(),
+                engineEditText.getText().toString(),
+                descriptionEditText.getText().toString(),
+                pricePaidEditText.getText().toString(),
+                priceSoldEditText.getText().toString()};
+
+        return strings;
+    }
+
+    private void startExpenseDetailActivity(int position) {
+        Intent expenseDetailActivity = new Intent(this, ExpenseDetailActivity.class);
+        expenseDetailActivity.putExtra("Vin", vehicle.getVin().toString());
+        expenseDetailActivity.putExtra("ExpensePosition", position);
+        startActivity(expenseDetailActivity);
     }
 
     private class EditInfoTask extends AsyncTask<String, Void, Void> {
@@ -319,74 +469,46 @@ public class VehicleDetailActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(final String... params) {
-            final String vin = params[0];
-            realm = Realm.getDefaultInstance();
-            realm.executeTransaction(new Realm.Transaction() {
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            Realm realmBackground = Realm.getDefaultInstance();
+
+            realmBackground.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    realm.where(Vehicle.class)
-                            .equalTo("Vin", vin)
-                            .findFirst()
-                            .setYear(params[1]);
+                    String vin = params[0];
+                    Vehicle vehicle = realm.where(Vehicle.class).equalTo("Vin", vin).findFirst();
+                    ArrayList<Expense> expenses = new ArrayList<>(customSwipeExpensesRecyclerViewAdapter.getAdapterArray());
 
-                    realm.where(Vehicle.class)
-                            .equalTo("Vin", vin)
-                            .findFirst()
-                            .setMake(params[2]);
-
-                    realm.where(Vehicle.class)
-                            .equalTo("Vin", vin)
-                            .findFirst()
-                            .setModel(params[3]);
-
-                    realm.where(Vehicle.class)
-                            .equalTo("Vin", vin)
-                            .findFirst()
-                            .setTrim(params[4]);
-
-                    realm.where(Vehicle.class)
-                            .equalTo("Vin", vin)
-                            .findFirst()
-                            .setStyle(params[5]);
-
-                    realm.where(Vehicle.class)
-                            .equalTo("Vin", vin)
-                            .findFirst()
-                            .setEngine(params[6]);
-
-                    realm.where(Vehicle.class)
-                            .equalTo("Vin", vin)
-                            .findFirst()
-                            .setDescription(params[7]);
+                    vehicle.setVin(vin);
+                    vehicle.setYear(params[1]);
+                    vehicle.setMake(params[2]);
+                    vehicle.setModel(params[3]);
+                    vehicle.setTrim(params[4]);
+                    vehicle.setStyle(params[5]);
+                    vehicle.setEngine(params[6]);
+                    vehicle.setDescription(params[7]);
 
                     if (!params[8].equals("")) {
-                        realm.where(Vehicle.class)
-                                .equalTo("Vin", vin)
-                                .findFirst()
-                                .setPricePaid(Double.parseDouble(params[8].toString()));
+                        vehicle.setPricePaid(Double.parseDouble(params[8].toString()));
                     } else {
-                        realm.where(Vehicle.class)
-                                .equalTo("Vin", vin)
-                                .findFirst()
-                                .setPricePaid(0);
+                        vehicle.setPaidPriceBeenSetBefore(false);
                     }
 
                     if (!params[9].equals("")) {
-                        realm.where(Vehicle.class)
-                                .equalTo("Vin", vin)
-                                .findFirst()
-                                .setPriceSold(Double.parseDouble(params[9].toString()));
+                        vehicle.setPriceSold(Double.parseDouble(params[9].toString()));
                     } else {
-                        realm.where(Vehicle.class)
-                                .equalTo("Vin", vin)
-                                .findFirst()
-                                .setSoldPriceBeenSetBefore(false);
+                        vehicle.setSoldPriceBeenSetBefore(false);
                     }
 
-                    realm.where(Vehicle.class)
-                            .equalTo("Vin", vin)
-                            .findFirst()
-                            .setVin(vin);
+                    vehicle.clearExpenses();
+                    for (Expense expense : expenses) {
+                        vehicle.addExpense(expense);
+                    }
                 }
             });
 
@@ -401,17 +523,10 @@ public class VehicleDetailActivity extends AppCompatActivity {
             frameLayout.setVisibility(View.GONE);
             frameLayout.setClickable(false);
 
-            if (return_main) {
-                finish();
-            } else {
-                deactivateEditMode();
-            }
+            vehicle = realm.where(Vehicle.class).equalTo("Vin", getIntent().getStringExtra("Vin")).findFirst();
+            deactivateEditMode();
 
             toast(toolbarTitle + " updated");
-
-            return_main = false;
-
-            realm = Realm.getDefaultInstance();
         }
     }
 

@@ -1,10 +1,10 @@
 package com.choch.michaeldicioccio.myapplication.Vehicle;
 
+import java.util.ArrayList;
+
+import io.realm.RealmList;
 import io.realm.RealmObject;
 
-/**
- * Created by michaeldicioccio on 9/5/17.
- */
 
 public class Vehicle extends RealmObject {
 
@@ -22,12 +22,18 @@ public class Vehicle extends RealmObject {
     double price_paid;
     double price_sold;
 
+    RealmList<Expense> expenses;
+
+    boolean paid_price_set;
     boolean sold_price_set;
     boolean sold;
 
+    /* Constructor */
     public Vehicle () {
         this.sold_price_set = false;
         this.sold = false;
+
+        this.expenses = new RealmList<>();
     }
 
     /* Getters */
@@ -73,6 +79,10 @@ public class Vehicle extends RealmObject {
 
     public double getPriceSold() {
         return price_sold;
+    }
+
+    public boolean hasPaidPriceBeenSetBefore() {
+        return paid_price_set;
     }
 
     public boolean hasSoldPriceBeenSetBefore() {
@@ -122,11 +132,16 @@ public class Vehicle extends RealmObject {
 
     public void setPricePaid(double price) {
         this.price_paid = price;
+        this.paid_price_set = true;
     }
 
     public void setPriceSold(double price) {
         this.price_sold = price;
         this.sold_price_set = true;
+    }
+
+    public void setPaidPriceBeenSetBefore(boolean paid) {
+        this.paid_price_set = paid;
     }
 
     public void setSoldPriceBeenSetBefore(boolean sold) {
@@ -135,6 +150,31 @@ public class Vehicle extends RealmObject {
 
     public void setSold(boolean sold) {
         this.sold = sold;
+    }
+
+    /* Expenses */
+    public Expense getExpenseAt(int position) {
+        return expenses.get(position);
+    }
+
+    public void addExpense(Expense expense) {
+        expenses.add(expense);
+    }
+
+    public void removeExpense(int position) {
+        expenses.remove(position);
+    }
+
+    public int getExpenseCount() {
+        return expenses.size();
+    }
+
+    public ArrayList<Expense> getExpenses() {
+        return new ArrayList<>(expenses);
+    }
+
+    public void clearExpenses() {
+        expenses.clear();
     }
 
 }

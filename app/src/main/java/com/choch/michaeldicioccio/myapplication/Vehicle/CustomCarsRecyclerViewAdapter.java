@@ -1,9 +1,7 @@
-package com.choch.michaeldicioccio.myapplication;
+package com.choch.michaeldicioccio.myapplication.Vehicle;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.speech.tts.TextToSpeech;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.SparseBooleanArray;
@@ -13,7 +11,9 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
+import com.choch.michaeldicioccio.myapplication.Defaults;
+import com.choch.michaeldicioccio.myapplication.R;
+import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -77,8 +77,8 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
         holder.itemVinTetxView.setText(vehicle.getVin());
         if (vehicle.isSold()) {
             holder.itemOwnedStatusTextView.setText("Sold");
+            holder.itemOwnedStatusRelativeLayout.setBackgroundColor(context.getResources().getColor(R.color.colorIconNotActivated));
             if (vehicle.hasSoldPriceBeenSetBefore()) {
-                holder.itemOwnedStatusRelativeLayout.setBackgroundColor(context.getResources().getColor(R.color.colorIconNotActivated));
                 String[] price_sold = df.format(vehicle.getPriceSold()).split("\\.");
                 holder.itemPriceTextView.setText(Html.fromHtml("$" + price_sold[0] + "<small><small>" + "." + price_sold[1] + "</small></small>"));
                 holder.itemPriceTextView.setTextColor(context.getResources().getColor(R.color.colorIconNotActivated));
@@ -103,8 +103,18 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
         } else {
             holder.itemOwnedStatusTextView.setText("Owned");
             holder.itemOwnedStatusRelativeLayout.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
-            String[] price = df.format(vehicle.getPricePaid()).split("\\.");
-            holder.itemPriceTextView.setText(Html.fromHtml("$" + price[0] + "<small><small>" + "." + price[1] + "</small></small>"));
+            if (vehicle.hasPaidPriceBeenSetBefore()) {
+                String[] price_paid = df.format(vehicle.getPricePaid()).split("\\.");
+                holder.itemPriceTextView.setText(Html.fromHtml("$" + price_paid[0] + "<small><small>" + "." + price_paid[1] + "</small></small>"));
+                holder.itemPriceTextView.setTextColor(context.getResources().getColor(R.color.colorIconNotActivated));
+                holder.itemPriceTextView.setTextSize(18);
+            } else {
+                holder.itemPriceTextView.setText("Add Price Paid");
+                holder.itemPriceTextView.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+                holder.itemPriceTextView.setTextSize(15);
+
+                holder.itemProfitTextView.setText("");
+            }
 
         }
 

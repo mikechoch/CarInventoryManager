@@ -4,10 +4,8 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
@@ -30,7 +28,7 @@ import android.widget.Toast;
 
 
 import com.choch.michaeldicioccio.myapplication.Activities.VehicleDetailActivity;
-import com.choch.michaeldicioccio.myapplication.CustomCarsRecyclerViewAdapter;
+import com.choch.michaeldicioccio.myapplication.Vehicle.CustomCarsRecyclerViewAdapter;
 import com.choch.michaeldicioccio.myapplication.Activities.MainActivity;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;

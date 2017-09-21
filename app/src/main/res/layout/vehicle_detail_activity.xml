@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/vehicle_detail_coordinate_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:clipToPadding="false"
     android:background="@color/colorMainBackground">
 
     <android.support.design.widget.AppBarLayout
@@ -25,6 +27,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="4dp"
         android:clipToPadding="false"
+        android:clipChildren="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
@@ -34,7 +37,8 @@
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
             android:paddingBottom="8dp"
-            android:clipToPadding="false">
+            android:clipToPadding="false"
+            android:clipChildren="false">
 
             <android.support.v7.widget.CardView
                 android:id="@+id/vehicle_info_card_view"
@@ -49,6 +53,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
+                    android:clipToPadding="false"
                     android:background="@color/colorAccent">
 
                     <android.support.v7.widget.CardView
@@ -57,7 +62,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="6dp"
                         app:cardCornerRadius="2dp"
                         app:cardElevation="0dp">
 
@@ -85,216 +90,140 @@
 
                     </android.support.v7.widget.CardView>
 
-                    <LinearLayout
-                        android:id="@+id/vin_layout"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/vin_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentStart="true"
                         android:layout_below="@id/vehicle_info_title_card_view"
-                        android:layout_marginStart="2dp">
-
-                        <TextView
-                            android:id="@+id/vin_title_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="VIN:"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                        android:layout_marginStart="-2dp">
 
                         <EditText
                             android:id="@+id/vin_edit_text"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Add vin..."
-                            android:textColorHint="@color/colorPrimary"
-                            android:textSize="24sp"
+                            android:hint="Vin"
                             android:textColor="@color/colorIconNotActivated"
-                            android:inputType="textMultiLine"
+                            android:maxLines="1"
+                            android:maxLength="17"
+                            android:inputType="textNoSuggestions|textCapCharacters"
                             android:longClickable="false"/>
 
-                    </LinearLayout>
+                    </android.support.design.widget.TextInputLayout>
 
-                    <LinearLayout
-                        android:id="@+id/year_layout"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/year_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/vin_layout"
-                        android:layout_marginStart="2dp">
-
-                        <TextView
-                            android:id="@+id/year_title_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Year:"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                        android:layout_below="@id/vin_text_input_layout"
+                        android:layout_marginStart="-2dp">
 
                         <EditText
                             android:id="@+id/year_edit_text"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Add year..."
-                            android:textColorHint="@color/colorPrimary"
-                            android:textSize="24sp"
+                            android:hint="Year"
                             android:textColor="@color/colorIconNotActivated"
-                            android:inputType="number|textMultiLine"
+                            android:maxLines="1"
+                            android:maxLength="4"
+                            android:inputType="number"
                             android:longClickable="false"/>
 
-                    </LinearLayout>
+                    </android.support.design.widget.TextInputLayout>
 
-                    <LinearLayout
-                        android:id="@+id/make_layout"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/make_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/year_layout"
-                        android:layout_marginStart="2dp">
-
-                        <TextView
-                            android:id="@+id/make_title_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Make:"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                        android:layout_below="@id/year_text_input_layout"
+                        android:layout_marginStart="-2dp">
 
                         <EditText
                             android:id="@+id/make_edit_text"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Add make..."
-                            android:textColorHint="@color/colorPrimary"
-                            android:textSize="24sp"
+                            android:hint="Make"
                             android:textColor="@color/colorIconNotActivated"
-                            android:inputType="textMultiLine"
+                            android:maxLines="1"
+                            android:inputType="textCapWords"
                             android:longClickable="false"/>
 
-                    </LinearLayout>
+                    </android.support.design.widget.TextInputLayout>
 
-                    <LinearLayout
-                        android:id="@+id/model_layout"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/model_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/make_layout"
-                        android:layout_marginStart="2dp">
-
-                        <TextView
-                            android:id="@+id/model_title_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Model:"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                        android:layout_below="@id/make_text_input_layout"
+                        android:layout_marginStart="-2dp">
 
                         <EditText
                             android:id="@+id/model_edit_text"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Add model..."
-                            android:textColorHint="@color/colorPrimary"
-                            android:textSize="24sp"
+                            android:hint="Model"
                             android:textColor="@color/colorIconNotActivated"
-                            android:inputType="textMultiLine"
+                            android:maxLines="1"
+                            android:inputType="textCapWords"
                             android:longClickable="false"/>
 
-                    </LinearLayout>
+                    </android.support.design.widget.TextInputLayout>
 
-
-                    <LinearLayout
-                        android:id="@+id/trim_layout"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/trim_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/model_layout"
-                        android:layout_marginStart="2dp">
-
-                        <TextView
-                            android:id="@+id/trim_title_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Trim:"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                        android:layout_below="@id/model_text_input_layout"
+                        android:layout_marginStart="-2dp">
 
                         <EditText
                             android:id="@+id/trim_edit_text"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Add trim..."
-                            android:textColorHint="@color/colorPrimary"
-                            android:textSize="24sp"
+                            android:hint="Trim"
                             android:textColor="@color/colorIconNotActivated"
-                            android:inputType="textNoSuggestions|textMultiLine"
+                            android:maxLines="1"
+                            android:inputType="textNoSuggestions"
                             android:longClickable="false"/>
 
-                    </LinearLayout>
+                    </android.support.design.widget.TextInputLayout>
 
-                    <LinearLayout
-                        android:id="@+id/style_layout"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/style_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/trim_layout"
-                        android:layout_marginStart="2dp">
-
-                        <TextView
-                            android:id="@+id/style_title_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Style:"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                        android:layout_below="@id/trim_text_input_layout"
+                        android:layout_marginStart="-2dp">
 
                         <EditText
                             android:id="@+id/style_edit_text"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Add style..."
-                            android:textColorHint="@color/colorPrimary"
-                            android:textSize="24sp"
+                            android:hint="Style"
                             android:textColor="@color/colorIconNotActivated"
-                            android:inputType="textNoSuggestions|textMultiLine"
+                            android:maxLines="1"
+                            android:inputType="textNoSuggestions"
                             android:longClickable="false"/>
 
-                    </LinearLayout>
+                    </android.support.design.widget.TextInputLayout>
 
-                    <LinearLayout
-                        android:id="@+id/engine_layout"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/engine_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/style_layout"
-                        android:layout_marginStart="2dp">
-
-                        <TextView
-                            android:id="@+id/engine_title_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Engine:"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                        android:layout_below="@id/style_text_input_layout"
+                        android:layout_marginStart="-2dp">
 
                         <EditText
                             android:id="@+id/engine_edit_text"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Add engine..."
-                            android:textColorHint="@color/colorPrimary"
-                            android:textSize="24sp"
+                            android:hint="Engine"
                             android:textColor="@color/colorIconNotActivated"
-                            android:inputType="textNoSuggestions|textMultiLine"
+                            android:maxLines="1"
+                            android:inputType="textNoSuggestions"
                             android:longClickable="false"/>
 
-                    </LinearLayout>
+                    </android.support.design.widget.TextInputLayout>
 
                 </RelativeLayout>
 
@@ -307,12 +236,16 @@
                 android:layout_below="@id/vehicle_info_card_view"
                 app:cardElevation="4dp"
                 app:cardCornerRadius="0dp"
+                android:clipToPadding="false"
+                android:clipChildren="false"
                 app:cardUseCompatPadding="true">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
+                    android:clipToPadding="false"
+                    android:clipChildren="false"
                     android:background="@color/colorAccent">
 
                     <android.support.v7.widget.CardView
@@ -329,6 +262,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
+                            android:clipChildren="false"
                             android:background="@color/colorIconNotActivated">
 
                             <TextView
@@ -349,83 +283,152 @@
 
                     </android.support.v7.widget.CardView>
 
-                    <LinearLayout
-                        android:id="@+id/price_paid_layout"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/price_paid_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentStart="true"
                         android:layout_below="@id/vehicle_pricing_title_card_view"
-                        android:layout_marginStart="2dp">
+                        android:layout_marginStart="-2dp">
 
-                        <TextView
-                            android:id="@+id/price_paid_title_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="20sp"/>
+                            <EditText
+                                android:id="@+id/price_paid_edit_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Price paid"
+                                android:textColor="@color/colorIconNotActivated"
+                                android:maxLines="1"
+                                android:inputType="numberDecimal"
+                                android:longClickable="false"/>
 
-                        <EditText
-                            android:id="@+id/price_paid_edit_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:hint="Add price paid..."
-                            android:textColorHint="@color/colorPrimary"
-                            android:textSize="24sp"
-                            android:textColor="@color/colorIconNotActivated"
-                            android:inputType="numberDecimal"
-                            android:maxLines="1"
-                            android:longClickable="false"/>
+                    </android.support.design.widget.TextInputLayout>
 
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/price_sold_layout"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/price_sold_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/price_paid_layout"
-                        android:layout_marginStart="2dp">
-
-                        <TextView
-                            android:id="@+id/price_sold_title_text_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="20sp"/>
+                        android:layout_below="@id/price_paid_text_input_layout"
+                        android:layout_marginStart="-2dp">
 
                         <EditText
                             android:id="@+id/price_sold_edit_text"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Add price sold..."
-                            android:textColorHint="@color/colorPrimary"
-                            android:textSize="24sp"
+                            android:hint="Price sold"
                             android:textColor="@color/colorIconNotActivated"
-                            android:inputType="numberDecimal"
                             android:maxLines="1"
+                            android:inputType="numberDecimal"
                             android:longClickable="false"/>
 
-                    </LinearLayout>
+                    </android.support.design.widget.TextInputLayout>
 
-                    <LinearLayout
-                        android:id="@+id/price_expenses_layout"
-                        android:layout_width="match_parent"
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/vehicle_expenses_title_card_view"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
                         android:layout_alignParentStart="true"
-                        android:layout_below="@id/price_sold_layout"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginStart="2dp">
+                        android:layout_below="@id/price_sold_text_input_layout"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="8dp"
+                        app:cardCornerRadius="2dp"
+                        app:cardElevation="0dp">
 
-                        <TextView
-                            android:id="@+id/price_expenses_title_text_view"
+                        <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Expenses:"
-                            android:textSize="20sp"
-                            android:textStyle="bold"/>
+                            android:gravity="center"
+                            android:clipChildren="false"
+                            android:background="@color/colorIconNotActivated">
 
-                    </LinearLayout>
+                            <TextView
+                                android:id="@+id/vehicle_expenses_text_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginTop="2dp"
+                                android:layout_marginBottom="2dp"
+                                android:text="Vehicle Expenses"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorAccent"/>
+
+                        </RelativeLayout>
+
+                    </android.support.v7.widget.CardView>
+                    
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/swipe_expenses_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/vehicle_expenses_title_card_view"
+                        android:layout_marginStart="-16dp"
+                        android:layout_marginEnd="-16dp"
+                        android:clipToPadding="false"
+                        android:visibility="gone"
+                        android:nestedScrollingEnabled="false">
+
+                    </android.support.v7.widget.RecyclerView>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/no_swipe_expenses_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/vehicle_expenses_title_card_view"
+                        android:layout_marginStart="-16dp"
+                        android:layout_marginEnd="-16dp"
+                        android:clipToPadding="false"
+                        android:visibility="gone"
+                        android:nestedScrollingEnabled="false">
+
+                    </android.support.v7.widget.RecyclerView>
+
+                    <TextView
+                        android:id="@+id/no_expenses_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/vehicle_expenses_title_card_view"
+                        android:layout_marginTop="8dp"
+                        android:text="No expenses"
+                        android:textSize="20sp"
+                        android:textColor="@color/colorIconNotActivated"
+                        android:textAlignment="center"
+                        android:visibility="gone"/>
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/add_expense_button_container"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/swipe_expenses_recycler_view"
+                        android:layout_marginTop="12dp"
+                        app:cardUseCompatPadding="true"
+                        android:visibility="gone"
+                        app:cardCornerRadius="0dp"
+                        app:cardElevation="3dp">
+
+                        <RelativeLayout
+                            android:id="@+id/add_expense_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/large_bar_button_selector">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:layout_marginTop="4dp"
+                                android:layout_marginBottom="4dp"
+                                android:layout_marginStart="24dp"
+                                android:layout_marginEnd="24dp"
+                                android:text="Add Expense"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorAccent"/>
+
+                        </RelativeLayout>
+
+                    </android.support.v7.widget.CardView>
 
                 </RelativeLayout>
 
@@ -444,6 +447,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
+                    android:clipToPadding="false"
                     android:background="@color/colorAccent">
 
                     <android.support.v7.widget.CardView
@@ -452,7 +456,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:layout_alignParentTop="true"
-                        android:layout_marginBottom="16dp"
+                        android:layout_marginBottom="8dp"
                         app:cardCornerRadius="2dp"
                         app:cardElevation="0dp">
 
@@ -480,28 +484,22 @@
 
                     </android.support.v7.widget.CardView>
 
-                    <TextView
-                        android:id="@+id/description_title_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/vehicle_description_title_card_view"
-                        android:layout_marginStart="2dp"
-                        android:text="Description:"
-                        android:textSize="20sp"
-                        android:textStyle="bold"/>
-
-                    <EditText
-                        android:id="@+id/description_edit_text"
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/description_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_below="@id/description_title_text_view"
-                        android:layout_marginStart="-1dp"
-                        android:hint="Add description..."
-                        android:textColorHint="@color/colorPrimary"
-                        android:textColor="@color/colorIconNotActivated"
-                        android:textSize="18sp"/>
+                        android:layout_below="@id/vehicle_description_title_card_view"
+                        android:layout_marginStart="-2dp">
+
+                        <EditText
+                            android:id="@+id/description_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Description"
+                            android:textColor="@color/colorIconNotActivated"
+                            android:inputType="textMultiLine|textCapSentences"/>
+
+                    </android.support.design.widget.TextInputLayout>
 
                 </RelativeLayout>
 
@@ -537,36 +535,6 @@
 
             </android.support.v7.widget.CardView>
 
-            <android.support.v7.widget.CardView
-                android:id="@+id/save_return_vehicle_button_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/save_vehicle_button_container"
-                app:cardUseCompatPadding="true"
-                android:visibility="gone"
-                app:cardCornerRadius="0dp"
-                app:cardElevation="4dp">
-
-                <RelativeLayout
-                    android:id="@+id/save_return_vehicle_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/large_bar_button_selector">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_margin="10dp"
-                        android:text="Save &amp; Return"
-                        android:textSize="26sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorAccent"/>
-
-                </RelativeLayout>
-
-            </android.support.v7.widget.CardView>
-
         </RelativeLayout>
 
     </ScrollView>
@@ -587,5 +555,13 @@
             android:visibility="gone"/>
 
     </FrameLayout>
+
+    <!-- Dummy item to prevent other times from receiving focus -->
+    <LinearLayout
+        android:id="@+id/dummy_layout"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="0px"
+        android:layout_height="0px"/>
 
 </android.support.design.widget.CoordinatorLayout>
