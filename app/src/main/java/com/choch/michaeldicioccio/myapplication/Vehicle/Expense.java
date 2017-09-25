@@ -6,14 +6,20 @@ import io.realm.RealmObject;
 public class Expense extends RealmObject {
 
     /* Attributes */
-    String title;
-    String description;
+    private String title;
+    private String description;
 
-    double price;
+    private double price;
 
     /* Constructor */
     public Expense() {
 
+    }
+
+    public Expense(Expense expense) {
+        this.title = expense.getTitle();
+        this.price = expense.getPrice();
+        this.description = expense.getDescription();
     }
 
     /* Getters */
@@ -40,5 +46,15 @@ public class Expense extends RealmObject {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    /* Overrides */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Expense)) {
+            return false;
+        }
+
+        return title.equals(((Expense) obj).getTitle());
     }
 }

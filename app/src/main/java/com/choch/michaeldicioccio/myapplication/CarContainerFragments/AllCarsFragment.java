@@ -235,7 +235,7 @@ public class AllCarsFragment extends Fragment {
 
     private void startVehicleDetailActivity(int position) {
         Intent vehicleDetailIntent = new Intent(getActivity().getApplicationContext(), VehicleDetailActivity.class);
-        vehicleDetailIntent.putExtra("Vin", allCarsArrayList.get(position).getVin());
+        vehicleDetailIntent.putExtra("vin", allCarsArrayList.get(position).getVin());
         startActivity(vehicleDetailIntent);
     }
 

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
@@ -40,17 +41,14 @@ public class TypeVinActivity extends AppCompatActivity {
 
     private Realm realm;
 
-    private EditText vinEditText;
-    private RelativeLayout keyboardAlphaNumericRelativeLayout;
+    private EditText vinEditText, priceEditText;
+    private TextInputLayout vinTextInputLayout, priceTextInputLayout;
+    private RelativeLayout keyboardAlphaNumericRelativeLayout, keyboardCurrencyRelativeLayout;
 
-    private EditText priceEditText;
-    private RelativeLayout keyboardCurrencyRelativeLayout;
+    private LayoutTransition layoutDisappearingTransition, layoutAppearingTransition;
 
-    private LayoutTransition layoutDisappearingTransition;
-    private LayoutTransition layoutAppearingTransition;
-
-    private CardView addCarButtonContainer;
-    private RelativeLayout addCarButton;
+    private CardView addVehicleButtonContainer;
+    private RelativeLayout addVehicleButton;
 
     private ProgressBar progressBar;
     private FrameLayout frameLayout;
@@ -65,14 +63,12 @@ public class TypeVinActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
                 finish();
                 break;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -85,7 +81,7 @@ public class TypeVinActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Add Car");
+        getSupportActionBar().setTitle("Add Vehicle");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Realm.init(this);
@@ -100,9 +96,9 @@ public class TypeVinActivity extends AppCompatActivity {
         layoutAppearingTransition = new LayoutTransition();
         layoutAppearingTransition.setDuration(LayoutTransition.APPEARING, 100);
 
-        addCarButtonContainer = (CardView) findViewById(R.id.add_vehicle_button_container);
-        addCarButton = (RelativeLayout) findViewById(R.id.add_vehicle_button);
-        addCarButton.setOnClickListener(new View.OnClickListener() {
+        addVehicleButtonContainer = (CardView) findViewById(R.id.add_vehicle_button_container);
+        addVehicleButton = (RelativeLayout) findViewById(R.id.add_vehicle_button);
+        addVehicleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String vin = vinEditText.getText().toString();
@@ -112,19 +108,17 @@ public class TypeVinActivity extends AppCompatActivity {
                 if (vinErrorCheck.verifyVinLength(vin)) {
                     vin = vinErrorCheck.getVin();
 
-                    if (realm.where(Vehicle.class).equalTo("Vin", vin).findFirst() == null) {
+                    if (realm.where(Vehicle.class).equalTo("vin", vin).findFirst() == null) {
                         String[] vinParams = {vin, priceEditText.getText().toString()};
                         new VinCheckTask().execute(vinParams);
 
                     } else {
-                        toast(MessageStrings.VIN_ALREADY_SCANNED.getMessage(), false);
-                        vinEditText.setTextColor(getResources().getColor(R.color.colorInvalidVin));
-                        vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_invalid));
+                        vinTextInputLayout.setError("Enter a valid vin");
+                        vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
                     }
                 } else {
-                    toast(vinErrorCheck.getErrorMessage(), false);
-                    vinEditText.setTextColor(getResources().getColor(R.color.colorInvalidVin));
-                    vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_invalid));
+                    vinTextInputLayout.setError("Enter a valid vin");
+                    vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
                 }
             }
         });
@@ -151,6 +145,82 @@ public class TypeVinActivity extends AppCompatActivity {
     private void setupKeyboardConnectionToEditText() {
         CoordinatorLayout typeVinCoordinateLayout = (CoordinatorLayout) findViewById(R.id.type_vin_coordinate_layout);
 
+        vinTextInputLayout = (TextInputLayout) findViewById(R.id.type_vin_text_input_layout);
+        vinEditText = (EditText) typeVinCoordinateLayout.findViewById(R.id.type_vin_edit_text);
+        vinEditText.setTextColor(getResources().getColor(R.color.colorIconNotActivated));
+        vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_not_17));
+        vinEditText.setShowSoftInputOnFocus(false);
+        vinEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    if (vinEditText.getText().length() == 17) {
+                        vinTextInputLayout.setErrorEnabled(false);
+                        vinEditText.setTextColor(getResources().getColor(R.color.colorValidVin));
+                        vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_17));
+
+                    } else if (vinEditText.getText().length() == 0) {
+                        vinTextInputLayout.setErrorEnabled(false);
+                        vinEditText.setTextColor(getResources().getColor(R.color.colorIconNotActivated));
+                        vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_17_focus));
+
+                    } else {
+                        vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_17_focus));
+                        vinTextInputLayout.setError((17 - vinEditText.getText().length()) + " characters remaining");
+                        vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                    }
+
+                    keyboardAlphaNumericRelativeLayout.setClickable(true);
+                    keyboardAlphaNumericRelativeLayout.bringToFront();
+                    keyboardCurrencyRelativeLayout.setClickable(false);
+                } else {
+                    vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_not_17));
+                }
+            }
+        });
+
+        vinEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+
+            }
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                          int arg3) {
+            }
+            @Override
+            public void afterTextChanged(Editable et) {
+                String s = et.toString();
+                if(!s.equals(s.toUpperCase())) {
+                    s = s.toUpperCase();
+                    vinEditText.setText(s);
+                    vinEditText.setSelection(vinEditText.getText().length());
+                }
+
+                if (vinEditText.getText().length() == 17 && priceEditText.getText().length() > 0) {
+                    addVehicleButtonContainer.setVisibility(View.VISIBLE);
+                } else {
+                    addVehicleButtonContainer.setVisibility(View.GONE);
+                }
+
+                vinTextInputLayout.setErrorEnabled(false);
+                if (vinEditText.getText().length() == 17) {
+                    vinEditText.setTextColor(getResources().getColor(R.color.colorValidVin));
+                    vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_17));
+
+                } else if (vinEditText.getText().length() == 0) {
+                    vinEditText.setTextColor(getResources().getColor(R.color.colorIconNotActivated));
+                    vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_17_focus));
+
+                } else {
+                    vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_17_focus));
+                    vinTextInputLayout.setError((17 - vinEditText.getText().length()) + " characters remaining");
+                    vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                }
+            }
+        });
+
+        priceTextInputLayout = (TextInputLayout) findViewById(R.id.type_price_text_input_layout);
         priceEditText = (EditText) typeVinCoordinateLayout.findViewById(R.id.type_price_edit_text);
         priceEditText.setTextColor(getResources().getColor(R.color.colorIconNotActivated));
         priceEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_not_17));
@@ -178,63 +248,9 @@ public class TypeVinActivity extends AppCompatActivity {
             public void afterTextChanged(Editable et) {
                 String s = et.toString();
                 if (vinEditText.getText().length() == 17 && priceEditText.getText().length() > 0) {
-                    addCarButtonContainer.setVisibility(View.VISIBLE);
+                    addVehicleButtonContainer.setVisibility(View.VISIBLE);
                 } else {
-                    addCarButtonContainer.setVisibility(View.GONE);
-                }
-            }
-        });
-
-
-        vinEditText = (EditText) typeVinCoordinateLayout.findViewById(R.id.type_vin_edit_text);
-        vinEditText.setTextColor(getResources().getColor(R.color.colorIconNotActivated));
-        vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_not_17));
-        vinEditText.setShowSoftInputOnFocus(false);
-        vinEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    keyboardAlphaNumericRelativeLayout.setClickable(true);
-                    keyboardAlphaNumericRelativeLayout.bringToFront();
-                    keyboardCurrencyRelativeLayout.setClickable(false);
-                }
-            }
-        });
-        vinEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-
-            }
-            @Override
-            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-                                          int arg3) {
-            }
-            @Override
-            public void afterTextChanged(Editable et) {
-                String s = et.toString();
-                if(!s.equals(s.toUpperCase())) {
-                    s = s.toUpperCase();
-                    vinEditText.setText(s);
-                    vinEditText.setSelection(vinEditText.getText().length());
-                }
-
-                if (vinEditText.getText().length() == 17 && priceEditText.getText().length() > 0) {
-                    addCarButtonContainer.setVisibility(View.VISIBLE);
-                } else {
-                    addCarButtonContainer.setVisibility(View.GONE);
-                }
-
-                if (vinEditText.getText().length() == 17) {
-                    keyboardAlphaNumericRelativeLayout.setLayoutTransition(layoutAppearingTransition);
-
-                    vinEditText.setTextColor(getResources().getColor(R.color.colorValidVin));
-                    vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_17));
-
-                } else {
-                    keyboardAlphaNumericRelativeLayout.setLayoutTransition(layoutDisappearingTransition);
-
-                    vinEditText.setTextColor(getResources().getColor(R.color.colorIconNotActivated));
-                    vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_not_17));
+                    addVehicleButtonContainer.setVisibility(View.GONE);
                 }
             }
         });
@@ -784,9 +800,9 @@ public class TypeVinActivity extends AppCompatActivity {
                 startActivity(mainActivityIntent);
 
             } else {
-                toast(MessageStrings.INVALID_VIN.getMessage(), false);
-                vinEditText.setTextColor(getResources().getColor(R.color.colorInvalidVin));
-                vinEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_invalid));
+                vinTextInputLayout.setError("Enter a valid vin");
+                vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+
                 progressBar.setVisibility(View.GONE);
                 frameLayout.setVisibility(View.GONE);
                 frameLayout.setClickable(false);

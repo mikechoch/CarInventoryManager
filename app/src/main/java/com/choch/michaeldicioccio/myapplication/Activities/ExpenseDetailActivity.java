@@ -1,11 +1,16 @@
 package com.choch.michaeldicioccio.myapplication.Activities;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +33,7 @@ import io.realm.Realm;
 
 public class ExpenseDetailActivity extends AppCompatActivity {
 
+    /* Globals */
     private Realm realm;
     private Toolbar toolbar;
 
@@ -35,9 +41,12 @@ public class ExpenseDetailActivity extends AppCompatActivity {
     private Expense expense;
 
     private boolean editModeEnabled = false;
+    private boolean newExpense;
     private String toolbarTitle;
+    private int expense_position;
 
     private EditText expenseTitleEditText, expensePriceEditText, expenseDescriptionEditText;
+    private TextInputLayout expenseTitleTextInputLayout, expensePriceTextInputLayout, expenseDescriptionTextInputLayout;
     private CardView saveVehicleButton;
     private RelativeLayout saveVehicleRelativeLayout;
     private LinearLayout dummyLinearLayout;
@@ -54,7 +63,12 @@ public class ExpenseDetailActivity extends AppCompatActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.expense_detail_menu, menu);
+//        getMenuInflater().inflate(R.menu.expense_detail_menu, menu);
+        if (getIntent().getIntExtra("ExpensePosition", -1) != -1) {
+            deactivateEditMode();
+        } else {
+            activateEditMode();
+        }
         return true;
     }
 
@@ -75,10 +89,14 @@ public class ExpenseDetailActivity extends AppCompatActivity {
             return true;
 
         } else if (id == android.R.id.home) {
-            if (editModeEnabled) {
-                deactivateEditMode();
+            if (newExpense) {
+                setResultForFinish(false);
             } else {
-                finish();
+                if (editModeEnabled) {
+                    deactivateEditMode();
+                } else {
+                    setResultForFinish(false);
+                }
             }
             return true;
 
@@ -87,6 +105,11 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * method called to perform basic application startup logic that should happen only once
+     * for the entire life of the activity
+     * @param savedInstanceState - access for cached variables
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,40 +122,90 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        if (getIntent().getStringExtra("Vin") != null) {
-            vehicle = realm.where(Vehicle.class).equalTo("Vin", getIntent().getStringExtra("Vin")).findFirst();
-            if (getIntent().getIntExtra("ExpensePosition", -1) != -1) {
-                expense = vehicle.getExpenses().get(getIntent().getIntExtra("ExpensePosition", -1));
-            }
-            toolbarTitle = expense.getTitle();
-            getSupportActionBar().setTitle(toolbarTitle);
-        }
+        expenseTitleTextInputLayout = (TextInputLayout) findViewById(R.id.expense_title_text_input_layout);
+        expensePriceTextInputLayout = (TextInputLayout) findViewById(R.id.expense_price_text_input_layout);
+        expenseDescriptionTextInputLayout = (TextInputLayout) findViewById(R.id.expense_description_text_input_layout);
 
         expenseTitleEditText = (EditText) findViewById(R.id.expense_title_edit_text);
+        expenseTitleEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                expenseTitleEditText.setHintTextColor(getResources().getColor(R.color.colorPrimary));
+                expenseTitleTextInputLayout.setErrorEnabled(false);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         expensePriceEditText = (EditText) findViewById(R.id.expense_price_edit_text);
+        expensePriceEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                expensePriceEditText.setHintTextColor(getResources().getColor(R.color.colorPrimary));
+                expensePriceTextInputLayout.setErrorEnabled(false);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         expenseDescriptionEditText = (EditText) findViewById(R.id.expense_description_edit_text);
-
-        expenseTitleEditText.setText(expense.getTitle());
-        expensePriceEditText.setText(df.format(expense.getPrice()));
-        expenseDescriptionEditText.setText(expense.getDescription());
-
-        expenseTitleEditText.setEnabled(false);
-        expensePriceEditText.setEnabled(false);
-        expenseDescriptionEditText.setEnabled(false);
 
         saveVehicleButton = (CardView) findViewById(R.id.save_expense_button_container);
         saveVehicleRelativeLayout = (RelativeLayout) findViewById(R.id.save_expense_button);
         saveVehicleRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (editModeEnabled) {
+                if (validEditTexts()) {
                     new EditExpenseTask().execute(getEditTextStrings());
                 }
             }
         });
 
         dummyLinearLayout = (LinearLayout) findViewById(R.id.dummy_layout);
-        dummyLinearLayout.requestFocus();
+
+        if (getIntent().getStringExtra("vin") != null) {
+            vehicle = realm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst();
+            if (getIntent().getIntExtra("ExpensePosition", -1) != -1) {
+                newExpense = false;
+                expense_position = getIntent().getIntExtra("ExpensePosition", -1);
+                expense = vehicle.getExpenses().get(expense_position);
+                toolbarTitle = expense.getTitle();
+
+                getSupportActionBar().setTitle(toolbarTitle);
+
+                expenseTitleEditText.setText(expense.getTitle());
+                expensePriceEditText.setText(df.format(expense.getPrice()));
+                expenseDescriptionEditText.setText(expense.getDescription());
+
+                expenseTitleEditText.setEnabled(false);
+                expensePriceEditText.setEnabled(false);
+                expenseDescriptionEditText.setEnabled(false);
+
+                dummyLinearLayout.requestFocus();
+
+            } else {
+                newExpense = true;
+                toolbarTitle = "New Expense";
+                activateEditMode();
+            }
+        }
+
     }
 
     /**
@@ -140,22 +213,28 @@ public class ExpenseDetailActivity extends AppCompatActivity {
      */
     @Override
     public void onBackPressed() {
-        if (editModeEnabled) {
-            deactivateEditMode();
-        } else {
+        if (newExpense) {
             super.onBackPressed();
+            setResultForFinish(false);
+        } else {
+            if (editModeEnabled) {
+                deactivateEditMode();
+            } else {
+                super.onBackPressed();
+                setResultForFinish(false);
+            }
         }
     }
 
     public void deactivateEditMode() {
         editModeEnabled = false;
-        toggleEditTextEditable();
-        toolbar.getMenu().clear();
 
         expenseTitleEditText.setText(expense.getTitle());
         expensePriceEditText.setText(df.format(expense.getPrice()));
         expenseDescriptionEditText.setText(expense.getDescription());
 
+        toggleEditTextEditable();
+        toolbar.getMenu().clear();
         toolbarTitle = expense.getTitle();
         toolbar.setTitle(toolbarTitle);
         toolbar.inflateMenu(R.menu.expense_detail_menu);
@@ -197,6 +276,54 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         return strings;
     }
 
+    private boolean validEditTexts() {
+        boolean passed = true;
+
+        boolean[] validEditTexts = {expenseTitleEditText.getText().toString().equals(""),
+                expensePriceEditText.getText().toString().equals(""),
+                !(isNumeric(expensePriceEditText.getText().toString()))};
+
+        for (int i = 0 ; i < validEditTexts.length; i++) {
+            if (validEditTexts[i]) {
+                switch(i) {
+                    case 0:
+                        expenseTitleTextInputLayout.setError("Enter a expense title");
+                        passed = false;
+                        break;
+                    case 1:
+                        expensePriceTextInputLayout.setError("Enter a valid price");
+                        passed = false;
+                        break;
+                    case 2:
+                        expensePriceTextInputLayout.setError("Enter a valid price");
+                        passed = false;
+                        break;
+                }
+            }
+        }
+
+        return passed;
+    }
+
+    private boolean isNumeric(String str) {
+        try {
+            double d = Double.parseDouble(str);
+        } catch(NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
+    private void setResultForFinish(boolean resultForFinish) {
+        Intent returnIntent = new Intent();
+        if (resultForFinish) {
+            setResult(Activity.RESULT_OK, returnIntent);
+        } else {
+            setResult(Activity.RESULT_CANCELED, returnIntent);
+        }
+        finish();
+    }
+
     private class EditExpenseTask extends AsyncTask<String, Void, Void> {
 
         @Override
@@ -209,31 +336,39 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected Void doInBackground(final String... params) {
             try {
                 Thread.sleep(250);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
-            Realm realmBackground = Realm.getDefaultInstance();
+            Realm backgroundRealm = Realm.getDefaultInstance();
+            backgroundRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm executeRealm) {
+                    Vehicle vehicle = executeRealm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst();
+                    Expense temp_expense = null;
 
-            Vehicle vehicle = realmBackground.where(Vehicle.class).equalTo("Vin", getIntent().getStringExtra("Vin")).findFirst();
-            Expense expense = vehicle.getExpenseAt(getIntent().getIntExtra("ExpensePosition", -1));
+                    if (!newExpense) {
+                        temp_expense = vehicle.getExpenseAt(getIntent().getIntExtra("ExpensePosition", -1));
+                    } else {
+                        temp_expense = executeRealm.createObject(Expense.class);
+                    }
 
-            realmBackground.beginTransaction();
-            if (expense == null) {
-                expense.setTitle(params[0]);
-                expense.setPrice(Double.parseDouble(params[1]));
-                expense.setDescription(params[2]);
-                vehicle.getExpenses().add(expense);
+                    temp_expense.setTitle(params[0]);
+                    temp_expense.setPrice(Double.parseDouble(params[1]));
+                    temp_expense.setDescription(params[2]);
 
-            } else {
-                expense.setTitle(params[0]);
-                expense.setPrice(Double.parseDouble(params[1]));
-                expense.setDescription(params[2]);
-            }
-            realmBackground.commitTransaction();
+                    if (getIntent().getIntExtra("ExpensePosition", -1) == -1) {
+                        vehicle.addExpense(temp_expense);
+                    } else {
+                        vehicle.getExpenses().add(getIntent().getIntExtra("ExpensePosition", -1), temp_expense);
+                    }
+                }
+            });
+
+            backgroundRealm.close();
 
             return null;
         }
@@ -241,13 +376,22 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
+
             progressBar.setVisibility(View.GONE);
             frameLayout.setVisibility(View.GONE);
             frameLayout.setClickable(false);
 
+            vehicle = realm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst();
+            if (getIntent().getIntExtra("ExpensePosition", -1) == -1) {
+                expense = vehicle.getExpenseAt(vehicle.getExpenseCount() - 1);
+            } else {
+                expense = vehicle.getExpenseAt(expense_position);
+            }
             deactivateEditMode();
 
             toast(toolbarTitle + " updated");
+
+            setResultForFinish(true);
         }
     }
 

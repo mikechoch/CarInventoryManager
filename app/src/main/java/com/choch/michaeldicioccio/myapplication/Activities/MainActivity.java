@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity
 
 
     /* Globals */
-    private int current_nav_item_selected;
+    public static int current_nav_item_selected;
 
     private Toolbar toolbar;
     private DrawerLayout drawer;

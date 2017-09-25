@@ -18,6 +18,12 @@ public class SplashScreenActivity extends AppCompatActivity {
 
         //TODO: add any code you want to do while the splash screen is showing before the MainActivity is shown
 
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();

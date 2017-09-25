@@ -85,12 +85,23 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
                 holder.itemPriceTextView.setTextSize(18);
 
                 Double profit = vehicle.getPriceSold() - vehicle.getPricePaid();
-                String[] price_profit = df.format(Math.abs(profit)).split("\\.");
-                holder.itemProfitTextView.setText(Html.fromHtml("$" + price_profit[0] + "<small><small>" + "." + price_profit[1] + "</small></small>"));
-                if (profit < 0) {
-                    holder.itemProfitTextView.setTextColor(context.getResources().getColor(R.color.colorInvalidVin));
+
+                for (int i  = 0; i < vehicle.getExpenseCount(); i++) {
+                    profit -= vehicle.getExpenseAt(i).getPrice();
+                }
+
+                if (vehicle.hasPaidPriceBeenSetBefore() && vehicle.hasSoldPriceBeenSetBefore()) {
+                    holder.itemProfitTextView.setVisibility(View.VISIBLE);
+
+                    String[] price_profit = df.format(Math.abs(profit)).split("\\.");
+                    holder.itemProfitTextView.setText(Html.fromHtml("$" + price_profit[0] + "<small><small>" + "." + price_profit[1] + "</small></small>"));
+                    if (profit < 0) {
+                        holder.itemProfitTextView.setTextColor(context.getResources().getColor(R.color.colorInvalidVin));
+                    } else {
+                        holder.itemProfitTextView.setTextColor(context.getResources().getColor(R.color.colorValidVin));
+                    }
                 } else {
-                    holder.itemProfitTextView.setTextColor(context.getResources().getColor(R.color.colorValidVin));
+                    holder.itemProfitTextView.setVisibility(View.GONE);
                 }
             } else {
                 holder.itemPriceTextView.setText("Add Price Sold");
@@ -102,6 +113,8 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
 
         } else {
             holder.itemOwnedStatusTextView.setText("Owned");
+            holder.itemProfitTextView.setVisibility(View.GONE);
+
             holder.itemOwnedStatusRelativeLayout.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
             if (vehicle.hasPaidPriceBeenSetBefore()) {
                 String[] price_paid = df.format(vehicle.getPricePaid()).split("\\.");
@@ -112,8 +125,6 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
                 holder.itemPriceTextView.setText("Add Price Paid");
                 holder.itemPriceTextView.setTextColor(context.getResources().getColor(R.color.colorPrimary));
                 holder.itemPriceTextView.setTextSize(15);
-
-                holder.itemProfitTextView.setText("");
             }
 
         }

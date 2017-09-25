@@ -135,7 +135,7 @@ public class ScanVinActivity extends AppCompatActivity implements ZBarScannerVie
         if (vinErrorCheck.verifyValidVin(rawResult.getBarcodeFormat().getName())) {
             String vin = vinErrorCheck.getVin();
 
-            if (realm.where(Vehicle.class).equalTo("Vin", vin).findFirst() == null) {
+            if (realm.where(Vehicle.class).equalTo("vin", vin).findFirst() == null) {
                 startTypeVinActivityFromScanVinActivity(vin);
 
             } else {

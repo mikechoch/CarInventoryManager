@@ -1,6 +1,7 @@
 package com.choch.michaeldicioccio.myapplication.Vehicle;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -9,7 +10,10 @@ import io.realm.RealmObject;
 public class Vehicle extends RealmObject {
 
     /* Attributes */
-    String Vin;
+    Date buy_date;
+    Date sell_date;
+
+    String vin;
     String year;
     String make;
     String model;
@@ -18,6 +22,8 @@ public class Vehicle extends RealmObject {
     String style;
     String engine;
     String description;
+
+    VehicleBuyer vehicleBuyer;
 
     double price_paid;
     double price_sold;
@@ -37,8 +43,16 @@ public class Vehicle extends RealmObject {
     }
 
     /* Getters */
+    public Date getBuyDate() {
+        return buy_date;
+    }
+
+    public Date getSellDate() {
+        return sell_date;
+    }
+
     public String getVin() {
-        return Vin;
+        return vin;
     }
 
     public String getYear() {
@@ -73,6 +87,10 @@ public class Vehicle extends RealmObject {
         return description;
     }
 
+    public VehicleBuyer getVehicleBuyer() {
+        return vehicleBuyer;
+    }
+
     public double getPricePaid() {
         return price_paid;
     }
@@ -94,8 +112,16 @@ public class Vehicle extends RealmObject {
     }
 
     /* Setters */
+    public void setBuyDate(Date date) {
+        this.buy_date = date;
+    }
+
+    public void setSellDate(Date date) {
+        this.sell_date = date;
+    }
+
     public void setVin(String vin) {
-        this.Vin = vin;
+        this.vin = vin;
     }
 
     public void setYear(String year) {
@@ -128,6 +154,10 @@ public class Vehicle extends RealmObject {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setVehicleBuyer(VehicleBuyer buyer) {
+        this.vehicleBuyer = buyer;
     }
 
     public void setPricePaid(double price) {

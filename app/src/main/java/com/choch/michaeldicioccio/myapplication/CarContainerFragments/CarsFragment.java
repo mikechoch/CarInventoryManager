@@ -285,24 +285,26 @@ public class CarsFragment extends Fragment {
                             .setAction("UNDO", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    realm.executeTransaction(new Realm.Transaction() {
-                                        @Override
-                                        public void execute(Realm realm) {
-                                            realm.where(Vehicle.class)
-                                                    .equalTo("sold", true)
-                                                    .equalTo("Vin", vehicle[0].getVin())
-                                                    .findFirst()
-                                                    .setSold(false);
+                                    if (MainActivity.current_nav_item_selected == R.id.nav_inventory) {
+                                        realm.executeTransaction(new Realm.Transaction() {
+                                            @Override
+                                            public void execute(Realm realm) {
+                                                realm.where(Vehicle.class)
+                                                        .equalTo("sold", true)
+                                                        .equalTo("vin", vehicle[0].getVin())
+                                                        .findFirst()
+                                                        .setSold(false);
 
-                                            customCarsRecyclerViewAdapter.addAt(
-                                                    position,
-                                                    vehicle[0]);
-                                        }
-                                    });
+                                                customCarsRecyclerViewAdapter.addAt(
+                                                        position,
+                                                        vehicle[0]);
+                                            }
+                                        });
 
-                                    MainActivity.checkArrayIsZeroDisplayZeroIcon(
-                                            carInventoryArrayList.size(),
-                                            noCarsRelativeLayout);
+                                        MainActivity.checkArrayIsZeroDisplayZeroIcon(
+                                                carInventoryArrayList.size(),
+                                                noCarsRelativeLayout);
+                                    }
                                 }
                             })
                             .setActionTextColor(getResources().getColor(R.color.colorPrimary))
@@ -375,7 +377,7 @@ public class CarsFragment extends Fragment {
 
     private void startVehicleDetailActivity(int position) {
         Intent vehicleDetailIntent = new Intent(getActivity().getApplicationContext(), VehicleDetailActivity.class);
-        vehicleDetailIntent.putExtra("Vin", carInventoryArrayList.get(position).getVin());
+        vehicleDetailIntent.putExtra("vin", carInventoryArrayList.get(position).getVin());
         startActivity(vehicleDetailIntent);
     }
 

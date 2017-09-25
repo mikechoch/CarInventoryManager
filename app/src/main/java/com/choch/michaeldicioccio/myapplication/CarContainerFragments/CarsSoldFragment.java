@@ -45,11 +45,13 @@ public class CarsSoldFragment extends Fragment {
 
     private RecyclerView carsSoldRecyclerView;
     private RelativeLayout noCarsSoldRelativeLayout;
+    private Snackbar undoSwipeSnackbar;
 
     public static Toolbar toolbar;
     public static DrawerLayout drawer;
     public static ActionBarDrawerToggle toggle;
     public static CustomCarsRecyclerViewAdapter customCarsSoldRecyclerViewAdapter;
+
 
     public CarsSoldFragment() {
     }
@@ -275,21 +277,22 @@ public class CarsSoldFragment extends Fragment {
                             .setAction("UNDO", new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    //TODO: undo the swipe
-                                    realm.executeTransaction(new Realm.Transaction() {
-                                        @Override
-                                        public void execute(Realm realm) {
-                                            realm.where(Vehicle.class).equalTo("sold", false)
-                                                    .equalTo("Vin", vehicle[0].getVin())
-                                                    .findFirst()
-                                                    .setSold(true);
-                                            customCarsSoldRecyclerViewAdapter.addAt(position, vehicle[0]);
-                                        }
-                                    });
+                                    if (MainActivity.current_nav_item_selected == R.id.nav_sold_cars) {
+                                        realm.executeTransaction(new Realm.Transaction() {
+                                            @Override
+                                            public void execute(Realm realm) {
+                                                realm.where(Vehicle.class).equalTo("sold", false)
+                                                        .equalTo("vin", vehicle[0].getVin())
+                                                        .findFirst()
+                                                        .setSold(true);
+                                                customCarsSoldRecyclerViewAdapter.addAt(position, vehicle[0]);
+                                            }
+                                        });
 
-                                    MainActivity.checkArrayIsZeroDisplayZeroIcon(
-                                            carsSoldArrayList.size(),
-                                            noCarsSoldRelativeLayout);
+                                        MainActivity.checkArrayIsZeroDisplayZeroIcon(
+                                                carsSoldArrayList.size(),
+                                                noCarsSoldRelativeLayout);
+                                    }
                                 }
                             })
                             .setActionTextColor(getResources().getColor(R.color.colorPrimary))
@@ -364,7 +367,7 @@ public class CarsSoldFragment extends Fragment {
 
     private void startVehicleDetailActivity(int position) {
         Intent vehicleDetailIntent = new Intent(getActivity().getApplicationContext(), VehicleDetailActivity.class);
-        vehicleDetailIntent.putExtra("Vin", carsSoldArrayList.get(position).getVin());
+        vehicleDetailIntent.putExtra("vin", carsSoldArrayList.get(position).getVin());
         startActivity(vehicleDetailIntent);
     }
 

@@ -30,84 +30,75 @@
         android:gravity="top|start"
         android:animateLayoutChanges="true">
 
-        <TextView
-            android:id="@+id/type_vin_title_text_view"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/type_vin_text_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="6dp"
-            android:text="VIN Number:"
-            android:textColor="@color/colorIconNotActivated"
-            android:textSize="18sp" />
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
 
-        <EditText
-            android:id="@+id/type_vin_edit_text"
+            <EditText
+                android:id="@+id/type_vin_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Vin #"
+                android:textColor="@color/colorIconNotActivated"
+                android:maxLines="1"
+                android:maxLength="17"
+                android:longClickable="false"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/type_price_text_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/type_vin_title_text_view"
+            android:layout_below="@id/type_vin_text_input_layout"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:hint=" VIN #"
-            android:textColorHint="@color/colorControlHighlight"
-            android:textSize="26sp"
-            android:maxLines="1"
-            android:maxLength="17"
-            android:textCursorDrawable="@drawable/type_vin_cursor" />
+            android:layout_marginEnd="16dp">
 
-        <TextView
-            android:id="@+id/type_price_title_text_view"
+            <EditText
+                android:id="@+id/type_price_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Price"
+                android:textColor="@color/colorIconNotActivated"
+                android:maxLines="1"
+                android:maxLength="12"
+                android:longClickable="false"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/type_date_bought_text_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/type_vin_edit_text"
+            android:layout_below="@id/type_price_text_input_layout"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="6dp"
-            android:text="Price Paid:"
-            android:textColor="@color/colorIconNotActivated"
-            android:textSize="18sp" />
+            android:layout_marginEnd="16dp">
 
-        <TextView
-            android:id="@+id/dollar_sign"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/type_price_title_text_view"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="4dp"
-            android:text="$"
-            android:textColor="@color/colorIconNotActivated"
-            android:textSize="26sp" />
+            <EditText
+                android:id="@+id/type_date_bought_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Date Bought"
+                android:textColor="@color/colorIconNotActivated"
+                android:maxLines="1"
+                android:longClickable="false"/>
 
-        <EditText
-            android:id="@+id/type_price_edit_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/dollar_sign"
-            android:layout_below="@id/type_price_title_text_view"
-            android:layout_marginEnd="16dp"
-            android:hint="0.00"
-            android:textColorHint="@color/colorControlHighlight"
-            android:textSize="26sp"
-            android:maxLines="1"
-            android:maxLength="12"
-            android:textCursorDrawable="@drawable/type_vin_cursor" />
+        </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.CardView
             android:id="@+id/add_vehicle_button_container"
-            android:layout_below="@id/type_price_edit_text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/type_date_bought_text_input_layout"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="24dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             app:cardUseCompatPadding="true"
             android:visibility="gone"
             app:cardCornerRadius="0dp"
@@ -115,17 +106,20 @@
 
             <RelativeLayout
                 android:id="@+id/add_vehicle_button"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/large_bar_button_selector">
+                android:background="@drawable/add_large_bar_button_selector">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:layout_margin="10dp"
-                    android:text="Add"
-                    android:textSize="26sp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp"
+                    android:text="Add Vehicle"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/colorAccent"/>
 
