@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorMainBackground"
+    android:fitsSystemWindows="true"
+    tools:context="com.choch.michaeldicioccio.myapplication.VehicleContainerFragments.VehiclesSoldFragment">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/vehicle_header_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:elevation="6dp"
+        app:cardCornerRadius="0dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="0dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:background="@color/colorAccent">
+
+            <TextView
+                android:id="@+id/vehicle_count_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <RelativeLayout
+                android:id="@+id/sort_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="8dp"
+                android:clickable="true"
+                android:background="@drawable/car_item_selector">
+
+                <TextView
+                    android:id="@+id/sort_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:paddingEnd="8dp"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorIconNotActivated"/>
+
+                <ImageView
+                    android:id="@+id/sort_image_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/sort_text_view"
+                    android:layout_centerVertical="true"
+                    android:paddingEnd="8dp"
+                    android:src="@drawable/sort_variant"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/cars_sold_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/vehicle_header_card_view"
+        android:paddingTop="8dp"
+        android:paddingBottom="100dp"
+        android:clipToPadding="false"
+        android:background="@color/colorMainBackground">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <RelativeLayout
+        android:id="@+id/no_cars_sold_relative_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <ImageView
+            android:id="@+id/cars_sold_icon"
+            android:contentDescription="@string/no_sold_cars_image_view_content_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_cash_usd_black_48dp"
+            android:tint="@color/colorIconNotActivated"/>
+
+        <TextView
+            android:id="@+id/no_cars_sold_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cars_sold_icon"
+            android:layout_centerHorizontal="true"
+            android:paddingTop="20dp"
+            android:text="@string/no_sold_cars"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

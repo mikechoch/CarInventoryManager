@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -28,29 +29,36 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.choch.michaeldicioccio.myapplication.Defaults;
+import com.appeaser.sublimepickerlibrary.datepicker.SelectedDate;
+import com.appeaser.sublimepickerlibrary.helpers.SublimeOptions;
+import com.appeaser.sublimepickerlibrary.recurrencepicker.SublimeRecurrencePicker;
+import com.choch.michaeldicioccio.myapplication.Default;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
+import com.choch.michaeldicioccio.myapplication.SublimePickerFragment;
 import com.choch.michaeldicioccio.myapplication.Vehicle.CustomExpensesRecyclerViewAdapter;
 import com.choch.michaeldicioccio.myapplication.Vehicle.Expense;
 import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 
 
 public class VehicleDetailActivity extends AppCompatActivity {
 
+    /* Globals */
     private Realm realm;
     private boolean editModeEnabled = false;
     private String toolbarTitle;
-    private DecimalFormat df = new DecimalFormat(Defaults.DOUBLE_FORMAT.getObject().toString());
+    private Date bought_date, sold_date;
 
     private ArrayList<Expense> expensesArrayList;
     private RecyclerView swipeExpensesRecyclerView, noSwipeExpensesRecyclerView;
@@ -60,15 +68,22 @@ public class VehicleDetailActivity extends AppCompatActivity {
     private Vehicle vehicle;
 
     private Toolbar toolbar;
-    private TextView noExpensesTextView;
+    private TextInputLayout dateSoldTextInputLayout, priceSoldTextInputLayout;
+    private TextView noExpensesTextView, clearDateBoughtTextView, clearDateSoldTextView;
     private EditText
             vinEditText, yearEditText, makeEditText, modelEditText, trimEditText, styleEditText,
-            engineEditText, dateBoughtEditText, pricePaidEditText, dateSoldEditText, priceSoldEditText, descriptionEditText;
-    private CardView addExpenseButtonCardView, deleteAllExpensesButtonCardView, saveVehicleButtonCardView;
+            engineEditText, buyerNameEdittext, buyerPhoneEditText, buyerEmailEditText,
+            dateBoughtEditText, pricePaidEditText, dateSoldEditText, priceSoldEditText,
+            descriptionEditText;
+    private CardView addExpenseButtonCardView, deleteAllExpensesButtonCardView,
+            saveVehicleButtonCardView, vehicleBuyerInfoCardView;
     private RelativeLayout addExpenseButtonRelativeLayout, deleteAllExpensesButtonRelativeLayout, saveVehicleButtonRelativeLayout;
     private LinearLayout dummyLinearLayout;
     private ProgressBar progressBar;
     private FrameLayout frameLayout;
+
+    private DecimalFormat df = new DecimalFormat(Default.DOUBLE_FORMAT.getObject().toString());
+    private DateFormat dateFormat = new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString(), Locale.US);
 
 
     /**
@@ -102,7 +117,7 @@ public class VehicleDetailActivity extends AppCompatActivity {
             if (editModeEnabled) {
                 deactivateEditMode();
             } else {
-                finish();
+                returnToMainFragment();
             }
             return true;
 
@@ -111,6 +126,11 @@ public class VehicleDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * method called to perform basic application startup logic that should happen only once
+     * for the entire life of the activity
+     * @param savedInstanceState - access for cached variables
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,6 +150,21 @@ public class VehicleDetailActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(toolbarTitle);
         }
 
+        vehicleBuyerInfoCardView = (CardView) findViewById(R.id.vehicle_buyer_info_card_view);
+
+        dateSoldTextInputLayout = (TextInputLayout) findViewById(R.id.date_sold_text_input_layout);
+        priceSoldTextInputLayout = (TextInputLayout) findViewById(R.id.price_sold_text_input_layout);
+
+        if (vehicle.isSold()) {
+            vehicleBuyerInfoCardView.setVisibility(View.VISIBLE);
+            dateSoldTextInputLayout.setVisibility(View.VISIBLE);
+            priceSoldTextInputLayout.setVisibility(View.VISIBLE);
+        } else {
+            vehicleBuyerInfoCardView.setVisibility(View.GONE);
+            dateSoldTextInputLayout.setVisibility(View.GONE);
+            priceSoldTextInputLayout.setVisibility(View.GONE);
+        }
+
         vinEditText = (EditText) findViewById(R.id.vin_edit_text);
         yearEditText = (EditText) findViewById(R.id.year_edit_text);
         makeEditText = (EditText) findViewById(R.id.make_edit_text);
@@ -137,11 +172,37 @@ public class VehicleDetailActivity extends AppCompatActivity {
         trimEditText = (EditText) findViewById(R.id.trim_edit_text);
         styleEditText = (EditText) findViewById(R.id.style_edit_text);
         engineEditText = (EditText) findViewById(R.id.engine_edit_text);
+        buyerNameEdittext = (EditText) findViewById(R.id.buyer_name_edit_text);
+        buyerPhoneEditText = (EditText) findViewById(R.id.buyer_phone_edit_text);
+        buyerEmailEditText = (EditText) findViewById(R.id.buyer_email_edit_text);
         dateBoughtEditText = (EditText) findViewById(R.id.date_bought_edit_text);
         pricePaidEditText = (EditText) findViewById(R.id.price_paid_edit_text);
         dateSoldEditText = (EditText) findViewById(R.id.date_sold_edit_text);
         priceSoldEditText = (EditText) findViewById(R.id.price_sold_edit_text);
         descriptionEditText = (EditText) findViewById(R.id.description_edit_text);
+
+        clearDateBoughtTextView = (TextView) findViewById(R.id.clear_date_bought_text_view);
+        clearDateBoughtTextView.bringToFront();
+        clearDateBoughtTextView.setVisibility(View.GONE);
+        clearDateBoughtTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dateBoughtEditText.setText("");
+                clearDateBoughtTextView.setVisibility(View.GONE);
+            }
+        });
+
+
+        clearDateSoldTextView = (TextView) findViewById(R.id.clear_date_sold_text_view);
+        clearDateSoldTextView.bringToFront();
+        clearDateSoldTextView.setVisibility(View.GONE);
+        clearDateSoldTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dateSoldEditText.setText("");
+                clearDateSoldTextView.setVisibility(View.GONE);
+            }
+        });
 
         vinEditText.setEnabled(false);
         yearEditText.setEnabled(false);
@@ -150,11 +211,84 @@ public class VehicleDetailActivity extends AppCompatActivity {
         trimEditText.setEnabled(false);
         styleEditText.setEnabled(false);
         engineEditText.setEnabled(false);
+        buyerNameEdittext.setEnabled(false);
+        buyerPhoneEditText.setEnabled(false);
+        buyerEmailEditText.setEnabled(false);
         dateBoughtEditText.setEnabled(false);
         pricePaidEditText.setEnabled(false);
         dateSoldEditText.setEnabled(false);
         priceSoldEditText.setEnabled(false);
         descriptionEditText.setEnabled(false);
+
+        dateBoughtEditText.setCursorVisible(false);
+        dateBoughtEditText.setShowSoftInputOnFocus(false);
+        dateBoughtEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    if (dateBoughtEditText.getText().toString().equals("")) {
+                        bought_date = new Date();
+                    } else {
+                        try {
+                            bought_date = new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString()).parse(dateBoughtEditText.getText().toString());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    createCalendarAlertDialog(dateBoughtEditText, clearDateBoughtTextView, bought_date).show(getFragmentManager(), "SUBLIME_PICKER");
+                }
+            }
+        });
+        dateBoughtEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dateBoughtEditText.getText().toString().equals("")) {
+                    bought_date = new Date();
+                } else {
+                    try {
+                        bought_date = new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString()).parse(dateBoughtEditText.getText().toString());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                createCalendarAlertDialog(dateBoughtEditText, clearDateBoughtTextView, bought_date).show(getFragmentManager(), "SUBLIME_PICKER");
+            }
+        });
+
+        dateSoldEditText.setCursorVisible(false);
+        dateSoldEditText.setShowSoftInputOnFocus(false);
+        dateSoldEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    if (dateSoldEditText.getText().toString().equals("")) {
+                        sold_date = new Date();
+                    } else {
+                        try {
+                            sold_date = new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString()).parse(dateSoldEditText.getText().toString());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    createCalendarAlertDialog(dateSoldEditText, clearDateSoldTextView, sold_date).show(getFragmentManager(), "SUBLIME_PICKER");
+                }
+            }
+        });
+        dateSoldEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (dateSoldEditText.getText().toString().equals("")) {
+                    sold_date = new Date();
+                } else {
+                    try {
+                        sold_date = new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString()).parse(dateSoldEditText.getText().toString());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                createCalendarAlertDialog(dateSoldEditText, clearDateSoldTextView, sold_date).show(getFragmentManager(), "SUBLIME_PICKER");
+            }
+        });
 
         vinEditText.setText(vehicle.getVin());
         yearEditText.setText(vehicle.getYear());
@@ -163,25 +297,31 @@ public class VehicleDetailActivity extends AppCompatActivity {
         trimEditText.setText(vehicle.getTrim());
         styleEditText.setText(vehicle.getStyle());
         engineEditText.setText(vehicle.getEngine());
+        buyerNameEdittext.setText(removeExtraSpacesName(vehicle.getVehicleBuyer().getName()));
+        buyerPhoneEditText.setText(fancyPhoneNumber(vehicle.getVehicleBuyer().getPhoneNumber()));
+        buyerEmailEditText.setText(removeExtraSpacesEmail(vehicle.getVehicleBuyer().getEmail()));
         descriptionEditText.setText(vehicle.getDescription());
 
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-        Date date1 = calendar.getTime();
-        dateBoughtEditText.setText(dateFormat.format(date));
-        dateSoldEditText.setText(dateFormat.format(date1));
+        if (vehicle.getBuyDate() != null) {
+            dateBoughtEditText.setText(dateFormat.format(vehicle.getBuyDate()));
+        } else {
+            dateBoughtEditText.setText("");
+        }
+
+        if (vehicle.getSellDate() != null) {
+            dateSoldEditText.setText(dateFormat.format(vehicle.getSellDate()));
+        } else {
+            dateSoldEditText.setText("");
+        }
 
         if (vehicle.hasPaidPriceBeenSetBefore()) {
-            pricePaidEditText.setText(df.format(vehicle.getPricePaid()));
+            pricePaidEditText.setText(("$" + df.format(vehicle.getPricePaid())));
         } else {
             pricePaidEditText.setText("");
         }
 
         if (vehicle.hasSoldPriceBeenSetBefore()) {
-            priceSoldEditText.setText(df.format(vehicle.getPriceSold()));
+            priceSoldEditText.setText(("$" + df.format(vehicle.getPriceSold())));
         } else {
             priceSoldEditText.setText("");
         }
@@ -301,7 +441,7 @@ public class VehicleDetailActivity extends AppCompatActivity {
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.LEFT | direction == ItemTouchHelper.RIGHT) {
-//                    final Expense expense = expensesArrayList.get(position);
+                    final Expense expense = expensesArrayList.get(position);
                     customSwipeExpensesRecyclerViewAdapter.removeAt(position);
 
                     if (customSwipeExpensesRecyclerViewAdapter.getItemCount() > 0) {
@@ -319,31 +459,31 @@ public class VehicleDetailActivity extends AppCompatActivity {
                         noSwipeExpensesRecyclerView.setVisibility(View.GONE);
                     }
 
-//                    CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.vehicle_detail_coordinate_layout);
-//                    Snackbar.make(coordinatorLayout, "Deleted " + expense.getTitle(), Snackbar.LENGTH_SHORT)
-//                            .setAction("UNDO", new View.OnClickListener() {
-//                                @Override
-//                                public void onClick(View v) {
-//                                    customSwipeExpensesRecyclerViewAdapter.addAt(position, expense);
-//
-//                                    if (customSwipeExpensesRecyclerViewAdapter.getItemCount() > 0) {
-//                                        noExpensesTextView.setVisibility(View.GONE);
-//                                        if (editModeEnabled) {
-//                                            swipeExpensesRecyclerView.setVisibility(View.VISIBLE);
-//                                            noSwipeExpensesRecyclerView.setVisibility(View.GONE);
-//                                        } else {
-//                                            swipeExpensesRecyclerView.setVisibility(View.GONE);
-//                                            noSwipeExpensesRecyclerView.setVisibility(View.VISIBLE);
-//                                        }
-//                                    } else {
-//                                        noExpensesTextView.setVisibility(View.VISIBLE);
-//                                        swipeExpensesRecyclerView.setVisibility(View.GONE);
-//                                        noSwipeExpensesRecyclerView.setVisibility(View.GONE);
-//                                    }
-//                                }
-//                            })
-//                            .setActionTextColor(getResources().getColor(R.color.colorPrimary))
-//                            .show();
+                    CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.vehicle_detail_coordinate_layout);
+                    Snackbar.make(coordinatorLayout, "Deleted " + expense.getTitle(), Snackbar.LENGTH_SHORT)
+                            .setAction("UNDO", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    customSwipeExpensesRecyclerViewAdapter.addAt(position, expense);
+
+                                    if (customSwipeExpensesRecyclerViewAdapter.getItemCount() > 0) {
+                                        noExpensesTextView.setVisibility(View.GONE);
+                                        if (editModeEnabled) {
+                                            swipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                                            noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+                                        } else {
+                                            swipeExpensesRecyclerView.setVisibility(View.GONE);
+                                            noSwipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                                        }
+                                    } else {
+                                        noExpensesTextView.setVisibility(View.VISIBLE);
+                                        swipeExpensesRecyclerView.setVisibility(View.GONE);
+                                        noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+                                    }
+                                }
+                            })
+                            .setActionTextColor(getResources().getColor(R.color.colorPrimary))
+                            .show();
                 }
             }
         };
@@ -403,10 +543,17 @@ public class VehicleDetailActivity extends AppCompatActivity {
         if (editModeEnabled) {
             deactivateEditMode();
         } else {
+            returnToMainFragment();
             super.onBackPressed();
         }
     }
 
+    /**
+     *
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
@@ -443,28 +590,152 @@ public class VehicleDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     *
+     * @param editText
+     * @param clearButton
+     * @param date
+     * @return
+     */
+    public SublimePickerFragment createCalendarAlertDialog(final EditText editText, final TextView clearButton, Date date) {
+        final SublimePickerFragment sublimePickerFragment = new SublimePickerFragment();
+        SublimeOptions sublimeOptions = new SublimeOptions();
+        sublimeOptions.setDisplayOptions(SublimeOptions.ACTIVATE_DATE_PICKER);
+        sublimeOptions.setPickerToShow(SublimeOptions.Picker.DATE_PICKER);
+        sublimeOptions.setCanPickDateRange(false);
+        sublimeOptions.setAnimateLayoutChanges(true);
+//        sublimeOptions.setDateRange(filterStartDate.getTime(), filterEndDate.getTime()); // useful in future
+
+        if (date == null) {
+            date = new Date();
+        }
+
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.setTime(date);
+        SelectedDate selectedDate = new SelectedDate(startCalendar);
+        sublimeOptions.setDateParams(selectedDate);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("SUBLIME_OPTIONS", sublimeOptions);
+        sublimePickerFragment.setArguments(bundle);
+        sublimePickerFragment.setStyle(R.style.SPStyle, 0);
+        final SublimePickerFragment.Callback mFragmentCallback = new SublimePickerFragment.Callback() {
+            @Override
+            public void onCancelled() {/* do nothing */}
+            @Override
+            public void onDateTimeRecurrenceSet(SelectedDate selectedDate, int hourOfDay, int minute, SublimeRecurrencePicker.RecurrenceOption recurrenceOption, String recurrenceRule) {
+                sublimePickerFragment.dismiss();
+                editText.setText(dateFormat.format(selectedDate.getFirstDate().getTime()));
+                clearButton.setVisibility(View.VISIBLE);
+            }
+        };
+
+        sublimePickerFragment.setCallback(mFragmentCallback);
+        return sublimePickerFragment;
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     */
+    public String removeExtraSpacesName(String name) {
+        if (name.length() > 0) {
+            StringBuilder spaceless_sb = new StringBuilder();
+            boolean first_alpha = false;
+            for (char letter : name.toCharArray()) {
+                if (first_alpha && letter == ' ') {
+                    spaceless_sb.append(" ");
+                    first_alpha = false;
+                } else if (!(letter == ' ')) {
+                    first_alpha = true;
+                    spaceless_sb.append(letter);
+                }
+            }
+
+            if (spaceless_sb.charAt(spaceless_sb.length() - 1) == ' ') {
+                return spaceless_sb.substring(0, spaceless_sb.length() - 1);
+            }
+            return spaceless_sb.toString();
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param phone_number
+     * @return
+     */
+    public String fancyPhoneNumber(String phone_number) {
+        StringBuilder phone_number_sb = new StringBuilder();
+        String area_code;
+        String three_digit;
+        String four_digit;
+        switch (phone_number.length()) {
+            case 7:
+                three_digit = phone_number.substring(0, 3);
+                four_digit = phone_number.substring(3);
+                phone_number_sb.append(three_digit + "-" + four_digit);
+                return phone_number_sb.toString();
+            case 10:
+                area_code = phone_number.substring(0, 3);
+                three_digit = phone_number.substring(3, 6);
+                four_digit = phone_number.substring(6);
+                phone_number_sb.append("(" + area_code + ") " + three_digit + "-" + four_digit);
+                return phone_number_sb.toString();
+        }
+
+        return phone_number;
+    }
+
+    /**
+     *
+     * @param email
+     * @return
+     */
+    public String removeExtraSpacesEmail(String email) {
+        StringBuilder email_sb = new StringBuilder();
+        if (email.length() > 0) {
+            for (char letter : email.toCharArray()) {
+                if (letter != ' ') {
+                    email_sb.append(letter);
+                }
+            }
+            return email_sb.toString();
+        }
+        return null;
+    }
+
+    /**
+     *
+     */
     public void deactivateEditMode() {
         editModeEnabled = false;
-        
-        descriptionEditText.setText(vehicle.getDescription());
 
-        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-        Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-        Date date1 = calendar.getTime();
-        dateBoughtEditText.setText(dateFormat.format(date));
-        dateSoldEditText.setText(dateFormat.format(date1));
+        buyerNameEdittext.setText(removeExtraSpacesName(vehicle.getVehicleBuyer().getName()));
+        buyerPhoneEditText.setText(fancyPhoneNumber(vehicle.getVehicleBuyer().getPhoneNumber()));
+        buyerEmailEditText.setText(removeExtraSpacesEmail(vehicle.getVehicleBuyer().getEmail()));
+
+        if (vehicle.getBuyDate() != null) {
+            dateBoughtEditText.setText(dateFormat.format(vehicle.getBuyDate()));
+        } else {
+            dateBoughtEditText.setText("");
+        }
+
+        if (vehicle.getSellDate() != null) {
+            dateSoldEditText.setText(dateFormat.format(vehicle.getSellDate()));
+        } else {
+            dateSoldEditText.setText("");
+        }
 
         if (vehicle.hasPaidPriceBeenSetBefore()) {
-            pricePaidEditText.setText(df.format(vehicle.getPricePaid()));
+            pricePaidEditText.setText(("$" + df.format(vehicle.getPricePaid())));
         } else {
             pricePaidEditText.setText("");
         }
 
         if (vehicle.hasSoldPriceBeenSetBefore()) {
-            priceSoldEditText.setText(df.format(vehicle.getPriceSold()));
+            priceSoldEditText.setText(("$" + df.format(vehicle.getPriceSold())));
         } else {
             priceSoldEditText.setText("");
         }
@@ -473,6 +744,8 @@ public class VehicleDetailActivity extends AppCompatActivity {
         for (int i = 0; i < vehicle.getExpenseCount(); i++) {
             expensesArrayList.add(vehicle.getExpenseAt(i));
         }
+
+        descriptionEditText.setText(vehicle.getDescription());
 
         customSwipeExpensesRecyclerViewAdapter.notifyDataSetChanged();
         customNoSwipeExpensesRecyclerViewAdapter.notifyDataSetChanged();
@@ -485,8 +758,26 @@ public class VehicleDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    /**
+     *
+     */
     private void activateEditMode() {
         editModeEnabled = true;
+
+        buyerPhoneEditText.setText(vehicle.getVehicleBuyer().getPhoneNumber());
+
+        if (vehicle.hasPaidPriceBeenSetBefore()) {
+            pricePaidEditText.setText(String.valueOf(vehicle.getPricePaid()));
+        } else {
+            pricePaidEditText.setText("");
+        }
+
+        if (vehicle.hasSoldPriceBeenSetBefore()) {
+            priceSoldEditText.setText(String.valueOf(vehicle.getPriceSold()));
+        } else {
+            priceSoldEditText.setText("");
+        }
+
         toggleEditTextEditable();
         toolbar.getMenu().clear();
         toolbar.setTitle("Edit: " + toolbarTitle);
@@ -495,13 +786,46 @@ public class VehicleDetailActivity extends AppCompatActivity {
 
     }
 
+    /**
+     *
+     */
     private void toggleEditTextEditable() {
         if (editModeEnabled) {
+            if (vehicle.isSold()) {
+                vehicleBuyerInfoCardView.setVisibility(View.VISIBLE);
+                dateSoldTextInputLayout.setVisibility(View.VISIBLE);
+                priceSoldTextInputLayout.setVisibility(View.VISIBLE);
+                buyerNameEdittext.setEnabled(true);
+                buyerPhoneEditText.setEnabled(true);
+                buyerEmailEditText.setEnabled(true);
+                dateSoldEditText.setEnabled(true);
+                priceSoldEditText.setEnabled(true);
+            } else {
+                vehicleBuyerInfoCardView.setVisibility(View.GONE);
+                dateSoldTextInputLayout.setVisibility(View.GONE);
+                priceSoldTextInputLayout.setVisibility(View.GONE);
+                buyerNameEdittext.setEnabled(false);
+                buyerPhoneEditText.setEnabled(false);
+                buyerEmailEditText.setEnabled(false);
+                dateSoldEditText.setEnabled(false);
+                priceSoldEditText.setEnabled(false);
+            }
+
             dateBoughtEditText.setEnabled(true);
             pricePaidEditText.setEnabled(true);
-            dateSoldEditText.setEnabled(true);
-            priceSoldEditText.setEnabled(true);
             descriptionEditText.setEnabled(true);
+
+            if (dateBoughtEditText.getText().toString().equals("")) {
+                clearDateBoughtTextView.setVisibility(View.GONE);
+            } else {
+                clearDateBoughtTextView.setVisibility(View.VISIBLE);
+            }
+
+            if (dateSoldEditText.getText().toString().equals("")) {
+                clearDateSoldTextView.setVisibility(View.GONE);
+            } else {
+                clearDateSoldTextView.setVisibility(View.VISIBLE);
+            }
 
             addExpenseButtonCardView.setVisibility(View.GONE);
             saveVehicleButtonCardView.setVisibility(View.VISIBLE);
@@ -520,11 +844,17 @@ public class VehicleDetailActivity extends AppCompatActivity {
                 noSwipeExpensesRecyclerView.setVisibility(View.GONE);
             }
         } else {
+            buyerNameEdittext.setEnabled(false);
+            buyerPhoneEditText.setEnabled(false);
+            buyerEmailEditText.setEnabled(false);
             dateBoughtEditText.setEnabled(false);
             pricePaidEditText.setEnabled(false);
             dateSoldEditText.setEnabled(false);
             priceSoldEditText.setEnabled(false);
             descriptionEditText.setEnabled(false);
+
+            clearDateBoughtTextView.setVisibility(View.GONE);
+            clearDateSoldTextView.setVisibility(View.GONE);
 
             addExpenseButtonCardView.setVisibility(View.VISIBLE);
             deleteAllExpensesButtonCardView.setVisibility(View.GONE);
@@ -544,6 +874,10 @@ public class VehicleDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     private String[] getEditTextStrings() {
         String[] strings = {
                 vinEditText.getText().toString(),
@@ -553,13 +887,22 @@ public class VehicleDetailActivity extends AppCompatActivity {
                 trimEditText.getText().toString(),
                 styleEditText.getText().toString(),
                 engineEditText.getText().toString(),
+                buyerNameEdittext.getText().toString(),
+                buyerPhoneEditText.getText().toString(),
+                buyerEmailEditText.getText().toString(),
                 descriptionEditText.getText().toString(),
+                dateBoughtEditText.getText().toString(),
                 pricePaidEditText.getText().toString(),
+                dateSoldEditText.getText().toString(),
                 priceSoldEditText.getText().toString()};
 
         return strings;
     }
 
+    /**
+     *
+     * @param position
+     */
     private void startExpenseDetailActivity(int position) {
         Intent expenseDetailActivity = new Intent(this, ExpenseDetailActivity.class);
         expenseDetailActivity.putExtra("vin", vehicle.getVin().toString());
@@ -567,6 +910,18 @@ public class VehicleDetailActivity extends AppCompatActivity {
         startActivityForResult(expenseDetailActivity, 1);
     }
 
+    /**
+     *
+     */
+    private void returnToMainFragment() {
+        Intent returnIntent = new Intent();
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+    }
+
+    /**
+     *
+     */
     private class EditInfoTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -601,16 +956,39 @@ public class VehicleDetailActivity extends AppCompatActivity {
                     vehicle.setTrim(params[4]);
                     vehicle.setStyle(params[5]);
                     vehicle.setEngine(params[6]);
-                    vehicle.setDescription(params[7]);
+                    vehicle.getVehicleBuyer().setName(params[7]);
+                    vehicle.getVehicleBuyer().setPhoneNumber(params[8]);
+                    vehicle.getVehicleBuyer().setEmail(params[9]);
+                    vehicle.setDescription(params[10]);
 
-                    if (!params[8].equals("")) {
-                        vehicle.setPricePaid(Double.parseDouble(params[8].toString()));
+                    if (!params[11].equals("")) {
+                        try {
+                            vehicle.setBuyDate(new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString()).parse(params[11]));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        vehicle.setBuyDate(null);
+                    }
+
+                    if (!params[12].equals("")) {
+                        vehicle.setPricePaid(Double.parseDouble(params[12]));
                     } else {
                         vehicle.setPaidPriceBeenSetBefore(false);
                     }
 
-                    if (!params[9].equals("")) {
-                        vehicle.setPriceSold(Double.parseDouble(params[9].toString()));
+                    if (!params[13].equals("")) {
+                        try {
+                            vehicle.setSellDate(new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString()).parse(params[13]));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        vehicle.setSellDate(null);
+                    }
+
+                    if (!params[14].equals("")) {
+                        vehicle.setPriceSold(Double.parseDouble(params[14]));
                     } else {
                         vehicle.setSoldPriceBeenSetBefore(false);
                     }
@@ -638,63 +1016,19 @@ public class VehicleDetailActivity extends AppCompatActivity {
             vehicle = realm.copyFromRealm(realm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst());
             deactivateEditMode();
 
-            toast(toolbarTitle + " updated");
+
+
+            validationToast(toolbarTitle + " updated");
         }
     }
 
-    private class DeleteExpensesTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-            frameLayout = (FrameLayout) findViewById(R.id.progress_bar_layout);
-            progressBar.setVisibility(View.VISIBLE);
-            frameLayout.setVisibility(View.VISIBLE);
-            frameLayout.setClickable(true);
-        }
-
-        @Override
-        protected String doInBackground(final String... params) {
-            try {
-                Thread.sleep(250);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            Realm backgroundRealm = Realm.getDefaultInstance();
-            backgroundRealm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm executeRealm) {
-                    String vin = params[0];
-                    Vehicle vehicle = executeRealm.where(Vehicle.class).equalTo("vin", vin).findFirst();
-                    vehicle.clearExpenses();
-                }
-            });
-
-            backgroundRealm.close();
-
-            return params[0];
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            progressBar.setVisibility(View.GONE);
-            frameLayout.setVisibility(View.GONE);
-            frameLayout.setClickable(false);
-
-            vehicle = realm.copyFromRealm(realm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst());
-//            deactivateEditMode();
-
-            toast("All expenses deleted");
-        }
-    }
-
-    private void toast(String string) {
-        Toast toast = Toast.makeText(this, Html.fromHtml("<b>" + string + " <font color=\"green\"><big>&#x2713;</big></font></b>"), Toast.LENGTH_LONG);
-//        ViewGroup group = (ViewGroup) toast.getView();
+    /**
+     * shortcut for toasting message to user
+     * @param toast_string - String to toast
+     */
+    private void validationToast(String toast_string) {
+        Toast toast = Toast.makeText(this, Html.fromHtml("<b>" + toast_string + " <font color=\"green\"><big>&#x2713;</big></font></b>"), Toast.LENGTH_LONG);
+//        ViewGroup group = (ViewGroup) validationToast.getView();
 //        TextView messageTextView = (TextView) group.getChildAt(0);
 //        messageTextView.(16);
         toast.show();

@@ -1,6 +1,8 @@
 package com.choch.michaeldicioccio.myapplication.Activities;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -9,6 +11,7 @@ import android.os.Vibrator;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,19 +26,24 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.choch.michaeldicioccio.myapplication.CarContainerFragments.AllCarsFragment;
-import com.choch.michaeldicioccio.myapplication.CarContainerFragments.CarsFragment;
-import com.choch.michaeldicioccio.myapplication.CarContainerFragments.CarsSoldFragment;
+import com.choch.michaeldicioccio.myapplication.Sort;
+import com.choch.michaeldicioccio.myapplication.Sorting;
+import com.choch.michaeldicioccio.myapplication.VehicleContainerFragments.AllVehiclesFragment;
+import com.choch.michaeldicioccio.myapplication.VehicleContainerFragments.VehiclesFragment;
+import com.choch.michaeldicioccio.myapplication.VehicleContainerFragments.VehiclesSoldFragment;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+
+import io.realm.Realm;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-
     /* Globals */
+    private Realm realm;
+
     public static int current_nav_item_selected;
 
     private Toolbar toolbar;
@@ -51,6 +59,8 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
 
     public static Vibrator vibrator;
+    public static String vehicleSortType;
+    public static String[] vehicleSortTypes;
 
     /**
      * inflates the menu for the current activity
@@ -90,13 +100,34 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Realm.init(this);
+        realm = Realm.getDefaultInstance();
+        if (realm.where(Sorting.class).findFirst() == null) {
+            final Sorting sorting = new Sorting();
+            vehicleSortType = sorting.getSortType();
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.insert(sorting);
+                }
+            });
+        } else {
+            vehicleSortType = realm.copyFromRealm(realm.where(Sorting.class).findFirst()).getSortType();
+        }
+
+        int count = 0;
+        vehicleSortTypes = new String[Sort.values().length];
+        for (Sort sort : Sort.values()) {
+            vehicleSortTypes[count++] = sort.getSortType();
+        }
+
         setupFloatingActionButtonMenu();
 
         vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
 
         getFragmentManager().beginTransaction().replace(
                 R.id.main_activity_content,
-                new CarsFragment()).commit();
+                new VehiclesFragment()).commit();
 
         updateToolbarOnBackPressed(toolbar);
 
@@ -126,13 +157,13 @@ public class MainActivity extends AppCompatActivity
 
         switch (checked_item) {
             case 0:
-                updateToolbarOnBackPressed(CarsFragment.deactivateActionMode());
+                updateToolbarOnBackPressed(VehiclesFragment.deactivateActionMode());
                 break;
             case 1:
-                updateToolbarOnBackPressed(CarsSoldFragment.deactivateActionMode());
+                updateToolbarOnBackPressed(VehiclesSoldFragment.deactivateActionMode());
                 break;
             case 2:
-                updateToolbarOnBackPressed(AllCarsFragment.deactivateActionMode());
+                updateToolbarOnBackPressed(AllVehiclesFragment.deactivateActionMode());
                 break;
         }
 
@@ -209,17 +240,17 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_inventory:
                 current_nav_item_selected = id;
                 new FragmentLoaderTask().execute(0);
-//                getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new CarsFragment()).commit();
+//                getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new VehiclesFragment()).commit();
                 break;
             case R.id.nav_sold_cars:
                 current_nav_item_selected = id;
                 new FragmentLoaderTask().execute(1);
-//                getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new CarsSoldFragment()).commit();
+//                getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new VehiclesSoldFragment()).commit();
                 break;
             case R.id.nav_all_cars:
                 current_nav_item_selected = id;
                 new FragmentLoaderTask().execute(2);
-//                getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new AllCarsFragment()).commit();
+//                getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new AllVehiclesFragment()).commit();
                 break;
             case R.id.nav_settings:
                 updateCurrentToolBarView(current_nav_item_selected);
@@ -239,13 +270,13 @@ public class MainActivity extends AppCompatActivity
     private void updateCurrentToolBarView(int current) {
         switch (current) {
             case R.id.nav_inventory:
-                updateToolbarOnBackPressed(CarsFragment.deactivateActionMode());
+                updateToolbarOnBackPressed(VehiclesFragment.deactivateActionMode());
                 break;
             case R.id.nav_sold_cars:
-                updateToolbarOnBackPressed(CarsSoldFragment.deactivateActionMode());
+                updateToolbarOnBackPressed(VehiclesSoldFragment.deactivateActionMode());
                 break;
             case R.id.nav_all_cars:
-                updateToolbarOnBackPressed(AllCarsFragment.deactivateActionMode());
+                updateToolbarOnBackPressed(AllVehiclesFragment.deactivateActionMode());
                 break;
         }
     }
@@ -337,8 +368,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * start the TypeVinActivity for result, so that if it returns a result it is captured
-     * requestCode 200
+     * start the TypeVinActivity
      */
     private void startTypeVinActivity() {
         Intent typeVinIntent = new Intent(this, TypeVinActivity.class);
@@ -380,6 +410,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * ASyncTask for loading frgaments
+     * Hides UI elements, shows progress spinner and then displays fragment UI
+     */
     private class FragmentLoaderTask extends AsyncTask<Integer, Void, Void> {
 
         @Override
@@ -399,13 +433,13 @@ public class MainActivity extends AppCompatActivity
         protected Void doInBackground(Integer... params) {
             switch (params[0]) {
                 case 0:
-                    getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new CarsFragment()).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new VehiclesFragment()).commit();
                     break;
                 case 1:
-                    getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new CarsSoldFragment()).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new VehiclesSoldFragment()).commit();
                     break;
                 case 2:
-                    getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new AllCarsFragment()).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_activity_content, new AllVehiclesFragment()).commit();
                     break;
             }
             return null;
@@ -422,10 +456,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * easier way to toast for LENGTH_SHORT duration and default location
-     * @param toast_string - the string to toast
+     * shortcut for toasting message to user
+     * @param toast_string - String to toast
      */
     private void toast(String toast_string) {
-        Toast.makeText(MainActivity.this, toast_string, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, toast_string, Toast.LENGTH_LONG).show();
     }
 }

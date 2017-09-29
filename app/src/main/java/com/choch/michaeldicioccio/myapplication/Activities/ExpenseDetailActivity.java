@@ -21,7 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.choch.michaeldicioccio.myapplication.Defaults;
+import com.choch.michaeldicioccio.myapplication.Default;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.choch.michaeldicioccio.myapplication.Vehicle.Expense;
 import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
@@ -53,7 +53,7 @@ public class ExpenseDetailActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private FrameLayout frameLayout;
 
-    private DecimalFormat df = new DecimalFormat(Defaults.DOUBLE_FORMAT.getObject().toString());
+    private DecimalFormat df = new DecimalFormat(Default.DOUBLE_FORMAT.getObject().toString());
 
 
     /**
@@ -122,6 +122,65 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        setupAllListeners();
+
+        dummyLinearLayout = (LinearLayout) findViewById(R.id.dummy_layout);
+
+        if (getIntent().getStringExtra("vin") != null) {
+            vehicle = realm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst();
+            if (getIntent().getIntExtra("ExpensePosition", -1) != -1) {
+                newExpense = false;
+                expense_position = getIntent().getIntExtra("ExpensePosition", -1);
+                expense = vehicle.getExpenses().get(expense_position);
+                toolbarTitle = expense.getTitle();
+
+                getSupportActionBar().setTitle(toolbarTitle);
+
+                expenseTitleEditText.setText(expense.getTitle());
+                expensePriceEditText.setText(("$" + df.format(expense.getPrice())));
+                expenseDescriptionEditText.setText(expense.getDescription());
+
+                expenseTitleEditText.setEnabled(false);
+                expensePriceEditText.setEnabled(false);
+                expenseDescriptionEditText.setEnabled(false);
+
+                dummyLinearLayout.requestFocus();
+
+            } else {
+                newExpense = true;
+                toolbarTitle = "New Expense";
+                activateEditMode();
+            }
+        }
+
+    }
+
+    /**
+     * handles bottom nav bar click
+     * new expenses will return straight to detail view
+     * pre-existing expenses will be handled as normal,
+     * in edit mode back press will leave edit mode
+     * out of edit mode back press will return to detail view
+     */
+    @Override
+    public void onBackPressed() {
+        if (newExpense) {
+            super.onBackPressed();
+            setResultForFinish(false);
+        } else {
+            if (editModeEnabled) {
+                deactivateEditMode();
+            } else {
+                super.onBackPressed();
+                setResultForFinish(false);
+            }
+        }
+    }
+
+    /**
+     * sets up all UI element listeners
+     */
+    public void setupAllListeners() {
         expenseTitleTextInputLayout = (TextInputLayout) findViewById(R.id.expense_title_text_input_layout);
         expensePriceTextInputLayout = (TextInputLayout) findViewById(R.id.expense_price_text_input_layout);
         expenseDescriptionTextInputLayout = (TextInputLayout) findViewById(R.id.expense_description_text_input_layout);
@@ -176,61 +235,16 @@ public class ExpenseDetailActivity extends AppCompatActivity {
                 }
             }
         });
-
-        dummyLinearLayout = (LinearLayout) findViewById(R.id.dummy_layout);
-
-        if (getIntent().getStringExtra("vin") != null) {
-            vehicle = realm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst();
-            if (getIntent().getIntExtra("ExpensePosition", -1) != -1) {
-                newExpense = false;
-                expense_position = getIntent().getIntExtra("ExpensePosition", -1);
-                expense = vehicle.getExpenses().get(expense_position);
-                toolbarTitle = expense.getTitle();
-
-                getSupportActionBar().setTitle(toolbarTitle);
-
-                expenseTitleEditText.setText(expense.getTitle());
-                expensePriceEditText.setText(df.format(expense.getPrice()));
-                expenseDescriptionEditText.setText(expense.getDescription());
-
-                expenseTitleEditText.setEnabled(false);
-                expensePriceEditText.setEnabled(false);
-                expenseDescriptionEditText.setEnabled(false);
-
-                dummyLinearLayout.requestFocus();
-
-            } else {
-                newExpense = true;
-                toolbarTitle = "New Expense";
-                activateEditMode();
-            }
-        }
-
     }
 
     /**
      *
      */
-    @Override
-    public void onBackPressed() {
-        if (newExpense) {
-            super.onBackPressed();
-            setResultForFinish(false);
-        } else {
-            if (editModeEnabled) {
-                deactivateEditMode();
-            } else {
-                super.onBackPressed();
-                setResultForFinish(false);
-            }
-        }
-    }
-
     public void deactivateEditMode() {
         editModeEnabled = false;
 
         expenseTitleEditText.setText(expense.getTitle());
-        expensePriceEditText.setText(df.format(expense.getPrice()));
+        expensePriceEditText.setText(("$" + df.format(expense.getPrice())));
         expenseDescriptionEditText.setText(expense.getDescription());
 
         toggleEditTextEditable();
@@ -243,6 +257,9 @@ public class ExpenseDetailActivity extends AppCompatActivity {
 
     private void activateEditMode() {
         editModeEnabled = true;
+
+        expensePriceEditText.setText(String.valueOf(expense.getPrice()));
+
         toggleEditTextEditable();
         toolbar.getMenu().clear();
         toolbar.setTitle("Edit: " + toolbarTitle);
@@ -389,15 +406,19 @@ public class ExpenseDetailActivity extends AppCompatActivity {
             }
             deactivateEditMode();
 
-            toast(toolbarTitle + " updated");
+            validationToast(toolbarTitle + " updated");
 
             setResultForFinish(true);
         }
     }
 
-    private void toast(String string) {
-        Toast toast = Toast.makeText(this, Html.fromHtml("<b>" + string + " <font color=\"green\"><big>&#x2713;</big></font></b>"), Toast.LENGTH_LONG);
-//        ViewGroup group = (ViewGroup) toast.getView();
+    /**
+     * shortcut for toasting message to user
+     * @param toast_string - String to toast
+     */
+    private void validationToast(String toast_string) {
+        Toast toast = Toast.makeText(this, Html.fromHtml("<b>" + toast_string + " <font color=\"green\"><big>&#x2713;</big></font></b>"), Toast.LENGTH_LONG);
+//        ViewGroup group = (ViewGroup) validationToast.getView();
 //        TextView messageTextView = (TextView) group.getChildAt(0);
 //        messageTextView.(16);
         toast.show();

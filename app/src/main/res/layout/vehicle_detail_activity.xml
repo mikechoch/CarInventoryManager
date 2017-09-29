@@ -230,10 +230,122 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
+                android:id="@+id/vehicle_buyer_info_card_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/vehicle_info_card_view"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="0dp"
+                app:cardUseCompatPadding="true">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:clipToPadding="false"
+                    android:background="@color/colorAccent">
+
+                    <android.support.v7.widget.CardView
+                        android:id="@+id/buyer_info_title_card_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginBottom="6dp"
+                        app:cardCornerRadius="2dp"
+                        app:cardElevation="0dp">
+
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:background="@color/colorIconNotActivated">
+
+                            <TextView
+                                android:id="@+id/buyer_info_title_text_view"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerInParent="true"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginTop="2dp"
+                                android:layout_marginBottom="2dp"
+                                android:text="Buyer Information"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorAccent"/>
+
+                        </RelativeLayout>
+
+                    </android.support.v7.widget.CardView>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/buyer_name_text_input_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/buyer_info_title_card_view"
+                        android:layout_marginStart="-2dp">
+
+                        <EditText
+                            android:id="@+id/buyer_name_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Name"
+                            android:textColor="@color/colorIconNotActivated"
+                            android:maxLines="1"
+                            android:inputType="textNoSuggestions|textCapWords"
+                            android:longClickable="false"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/buyer_phone_text_input_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/buyer_name_text_input_layout"
+                        android:layout_marginStart="-2dp">
+
+                        <EditText
+                            android:id="@+id/buyer_phone_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Phone"
+                            android:textColor="@color/colorIconNotActivated"
+                            android:maxLines="1"
+                            android:maxLength="14"
+                            android:inputType="phone"
+                            android:longClickable="false"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/buyer_email_text_input_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/buyer_phone_text_input_layout"
+                        android:layout_marginStart="-2dp">
+
+                        <EditText
+                            android:id="@+id/buyer_email_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Email"
+                            android:textColor="@color/colorIconNotActivated"
+                            android:maxLines="1"
+                            android:inputType="textEmailAddress"
+                            android:longClickable="false"/>
+
+                    </android.support.design.widget.TextInputLayout>
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
                 android:id="@+id/vehicle_pricing_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/vehicle_info_card_view"
+                android:layout_below="@id/vehicle_buyer_info_card_view"
                 app:cardElevation="4dp"
                 app:cardCornerRadius="0dp"
                 android:clipToPadding="false"
@@ -283,30 +395,50 @@
 
                     </android.support.v7.widget.CardView>
 
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/date_bought_text_input_layout"
+                    <RelativeLayout
+                        android:id="@+id/date_bought_linear_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/vehicle_pricing_title_card_view"
-                        android:layout_marginStart="-2dp">
+                        android:layout_below="@id/vehicle_pricing_title_card_view">
 
-                        <EditText
-                            android:id="@+id/date_bought_edit_text"
+                        <TextView
+                            android:id="@+id/clear_date_bought_text_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="8dp"
+                            android:text="CLEAR"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_color_selector"/>
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/date_bought_text_input_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Date Bought"
-                            android:textColor="@color/colorIconNotActivated"
-                            android:maxLines="1"
-                            android:inputType="date"
-                            android:longClickable="false"/>
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="-2dp">
 
-                    </android.support.design.widget.TextInputLayout>
+                            <EditText
+                                android:id="@+id/date_bought_edit_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Date Bought"
+                                android:textColor="@color/colorIconNotActivated"
+                                android:maxLines="1"
+                                android:inputType="date"
+                                android:longClickable="false"/>
+
+                        </android.support.design.widget.TextInputLayout>
+
+                    </RelativeLayout>
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/price_paid_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/date_bought_text_input_layout"
+                        android:layout_below="@id/date_bought_linear_layout"
                         android:layout_marginStart="-2dp">
 
                             <EditText
@@ -316,35 +448,56 @@
                                 android:hint="Price paid"
                                 android:textColor="@color/colorIconNotActivated"
                                 android:maxLines="1"
+                                android:maxLength="15"
                                 android:inputType="numberDecimal"
                                 android:longClickable="false"/>
 
                     </android.support.design.widget.TextInputLayout>
 
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/date_sold_text_input_layout"
+                    <RelativeLayout
+                        android:id="@+id/date_sold_linear_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/price_paid_text_input_layout"
-                        android:layout_marginStart="-2dp">
+                        android:layout_below="@id/price_paid_text_input_layout">
 
-                        <EditText
-                            android:id="@+id/date_sold_edit_text"
+                        <TextView
+                            android:id="@+id/clear_date_sold_text_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="8dp"
+                            android:text="CLEAR"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_color_selector" />
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/date_sold_text_input_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Date sold"
-                            android:textColor="@color/colorIconNotActivated"
-                            android:maxLines="1"
-                            android:inputType="date"
-                            android:longClickable="false"/>
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="-2dp">
 
-                    </android.support.design.widget.TextInputLayout>
+                            <EditText
+                                android:id="@+id/date_sold_edit_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="Date sold"
+                                android:textColor="@color/colorIconNotActivated"
+                                android:maxLines="1"
+                                android:inputType="date"
+                                android:longClickable="false"/>
+
+                        </android.support.design.widget.TextInputLayout>
+
+                    </RelativeLayout>
 
                     <android.support.design.widget.TextInputLayout
                         android:id="@+id/price_sold_text_input_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/date_sold_text_input_layout"
+                        android:layout_below="@id/date_sold_linear_layout"
                         android:layout_marginStart="-2dp">
 
                         <EditText
@@ -354,6 +507,7 @@
                             android:hint="Price sold"
                             android:textColor="@color/colorIconNotActivated"
                             android:maxLines="1"
+                            android:maxLength="15"
                             android:inputType="numberDecimal"
                             android:longClickable="false"/>
 

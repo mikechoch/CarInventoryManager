@@ -11,24 +11,30 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.choch.michaeldicioccio.myapplication.Defaults;
+import com.choch.michaeldicioccio.myapplication.Default;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
-public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCarsRecyclerViewAdapter.MyViewHolder> {
+public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<CustomVehiclesRecyclerViewAdapter.MyViewHolder> {
 
+    /* Globals */
     private Context context;
-    private ArrayList<Vehicle> carArrayList;
+    private ArrayList<Vehicle> vehicleArrayList;
     private RecyclerViewClickListener listener;
     private SparseBooleanArray selectedItems;
     private boolean actionModeEnabled = false;
 
-    private DecimalFormat df = new DecimalFormat(Defaults.DOUBLE_FORMAT.getObject().toString());
+    private DecimalFormat df = new DecimalFormat(Default.DOUBLE_FORMAT.getObject().toString());
+    private DateFormat dateFormat = new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString());
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public View view;
@@ -36,6 +42,7 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
         public TextView itemVinTetxView;
         public TextView itemOwnedStatusTextView;
         public RelativeLayout itemOwnedStatusRelativeLayout;
+        public TextView itemDateTextView;
         public TextView itemPriceTextView;
         public TextView itemProfitTextView;
         public RelativeLayout itemRelativeLayout;
@@ -47,15 +54,16 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
             itemVinTetxView = (TextView) view.findViewById(R.id.vin_edit_text);
             itemOwnedStatusTextView = (TextView) view.findViewById(R.id.owned_status_title_view);
             itemOwnedStatusRelativeLayout = (RelativeLayout) view.findViewById(R.id.owned_status_relative_layout);
+            itemDateTextView = (TextView) view.findViewById(R.id.date_text_view);
             itemPriceTextView = (TextView) view.findViewById(R.id.price_text_view);
             itemProfitTextView  =(TextView) view.findViewById(R.id.price_profit_text_view);
             itemRelativeLayout = (RelativeLayout) view.findViewById(R.id.car_item_relative_layout);
         }
     }
 
-    public CustomCarsRecyclerViewAdapter(Context context, ArrayList<Vehicle> carArrayList, RecyclerViewClickListener listener) {
+    public CustomVehiclesRecyclerViewAdapter(Context context, ArrayList<Vehicle> vehicleArrayList, RecyclerViewClickListener listener) {
         this.context = context;
-        this.carArrayList = carArrayList;
+        this.vehicleArrayList = vehicleArrayList;
         this.listener = listener;
         selectedItems = new SparseBooleanArray();
     }
@@ -63,14 +71,14 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.car_item_relative_layout, parent, false);
+                .inflate(R.layout.vehicle_item_relative_layout, parent, false);
 
         return new MyViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        final Vehicle vehicle = carArrayList.get(position);
+        final Vehicle vehicle = vehicleArrayList.get(position);
         holder.itemTitleTextView.setText(vehicle.getYear() + " "
                 + vehicle.getMake() + " "
                 + vehicle.getModel());
@@ -78,6 +86,14 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
         if (vehicle.isSold()) {
             holder.itemOwnedStatusTextView.setText("Sold");
             holder.itemOwnedStatusRelativeLayout.setBackgroundColor(context.getResources().getColor(R.color.colorIconNotActivated));
+
+            if (vehicle.getSellDate() != null) {
+                holder.itemDateTextView.setVisibility(View.VISIBLE);
+                holder.itemDateTextView.setText(dateFormat.format(vehicle.getSellDate()));
+            } else {
+                holder.itemDateTextView.setVisibility(View.GONE);
+            }
+
             if (vehicle.hasSoldPriceBeenSetBefore()) {
                 String[] price_sold = df.format(vehicle.getPriceSold()).split("\\.");
                 holder.itemPriceTextView.setText(Html.fromHtml("$" + price_sold[0] + "<small><small>" + "." + price_sold[1] + "</small></small>"));
@@ -114,8 +130,15 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
         } else {
             holder.itemOwnedStatusTextView.setText("Owned");
             holder.itemProfitTextView.setVisibility(View.GONE);
-
             holder.itemOwnedStatusRelativeLayout.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+
+            if (vehicle.getBuyDate() != null) {
+                holder.itemDateTextView.setVisibility(View.VISIBLE);
+                holder.itemDateTextView.setText(dateFormat.format(vehicle.getBuyDate()));
+            } else {
+                holder.itemDateTextView.setVisibility(View.GONE);
+            }
+
             if (vehicle.hasPaidPriceBeenSetBefore()) {
                 String[] price_paid = df.format(vehicle.getPricePaid()).split("\\.");
                 holder.itemPriceTextView.setText(Html.fromHtml("$" + price_paid[0] + "<small><small>" + "." + price_paid[1] + "</small></small>"));
@@ -167,7 +190,7 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
 
     @Override
     public int getItemCount() {
-        return carArrayList.size();
+        return vehicleArrayList.size();
     }
 
     public void toggleSelection(int position) {
@@ -205,7 +228,7 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
     }
 
     public void addAt(int position, Vehicle vehicle) {
-        carArrayList.add(position, vehicle);
+        vehicleArrayList.add(position, vehicle);
         notifyItemInserted(position);
 
         for (int i = getSelectedItemCount() - 1; i > -1; i--) {
@@ -218,7 +241,7 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
     }
 
     public void removeAt(int position) {
-        carArrayList.remove(position);
+        vehicleArrayList.remove(position);
         notifyItemRemoved(position);
 
         if (selectedItems.get(position, false)) {
@@ -232,6 +255,66 @@ public class CustomCarsRecyclerViewAdapter extends RecyclerView.Adapter<CustomCa
                 toggleSelection(key - 1);
             }
         }
+    }
+
+    public Vehicle getVehicleAt(int position) {
+        return vehicleArrayList.get(position);
+    }
+
+    public void setDataSet(ArrayList<Vehicle> carArrayList) {
+        this.vehicleArrayList = carArrayList;
+    }
+
+    public void sortDataSetByMake() {
+        System.out.println(vehicleArrayList);
+        Collections.sort(vehicleArrayList, new Comparator<Vehicle>() {
+            public int compare(Vehicle s1, Vehicle s2) {
+                return s1.getMake().compareTo(s2.getMake());
+            }
+        });
+
+        notifyItemRangeChanged(0, getItemCount());
+    }
+
+    public void sortDataSetByDate() {
+        ArrayList<Vehicle> noDateSetVehicles = new ArrayList<>();
+        for (int i = vehicleArrayList.size()-1; i > -1; i--) {
+            Vehicle temp_vehicle = vehicleArrayList.get(i);
+            if (temp_vehicle.isSold() && temp_vehicle.getSellDate() == null) {
+                vehicleArrayList.remove(temp_vehicle);
+                noDateSetVehicles.add(temp_vehicle);
+            } else if (!temp_vehicle.isSold() && temp_vehicle.getBuyDate() == null) {
+                vehicleArrayList.remove(temp_vehicle);
+                noDateSetVehicles.add(temp_vehicle);
+            }
+        }
+
+        Collections.sort(vehicleArrayList, new Comparator<Vehicle>() {
+            public int compare(Vehicle s1, Vehicle s2) {
+                if (s1.isSold() && s2.isSold()) {
+                    return s1.getSellDate().compareTo(s2.getSellDate());
+                } else if (s1.isSold()) {
+                    return s1.getSellDate().compareTo(s2.getBuyDate());
+                } else if (s2.isSold()) {
+                    return s1.getBuyDate().compareTo(s2.getSellDate());
+                }
+                return s1.getBuyDate().compareTo(s2.getBuyDate());
+            }
+        });
+
+        vehicleArrayList.addAll(noDateSetVehicles);
+        notifyItemRangeChanged(0, getItemCount());
+    }
+
+    public void sortDataSetByModel() {
+        System.out.println(vehicleArrayList);
+        Collections.sort(vehicleArrayList, new Comparator<Vehicle>() {
+            public int compare(Vehicle s1, Vehicle s2) {
+                return s1.getModel().compareTo(s2.getModel());
+            }
+        });
+
+        notifyItemRangeChanged(0, getItemCount());
     }
 }
 

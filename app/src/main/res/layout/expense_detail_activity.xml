@@ -100,7 +100,6 @@
                             android:layout_height="wrap_content"
                             android:hint="Expense"
                             android:textColor="@color/colorIconNotActivated"
-                            android:maxLines="1"
                             android:inputType="textCapWords"
                             android:longClickable="false"/>
 
@@ -120,6 +119,7 @@
                             android:hint="Price"
                             android:textColor="@color/colorIconNotActivated"
                             android:maxLines="1"
+                            android:maxLength="15"
                             android:inputType="numberDecimal"
                             android:longClickable="false"/>
 

@@ -65,6 +65,18 @@
     </android.support.v7.widget.CardView>
 
     <TextView
+        android:id="@+id/date_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@id/owned_status_card_view"
+        android:layout_marginStart="8dp"
+        android:paddingBottom="4dp"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorIconNotActivated"/>
+
+    <TextView
         android:id="@+id/year_make_model_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

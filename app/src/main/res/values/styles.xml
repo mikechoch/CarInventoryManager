@@ -19,11 +19,15 @@
         <item name="android:textColorHighlight">@color/colorTextHighlight</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
+        <item name="sublimePickerStyle">@style/SPStyle</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="MyDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert" />
 
     <style name="ScannerTheme" parent="Theme.AppCompat">
         <item name="android:windowTranslucentStatus">true</item>
@@ -37,13 +41,15 @@
         <item name="android:textColor">#FFFFFF</item>
     </style>
 
-    <style name="RedTextLabel" parent="TextAppearance.AppCompat">
-        <!-- Hint color and label color in FALSE state -->
-        <item name="android:textColorHint">@color/colorInvalidVin</item>
-        <!-- Label color in TRUE state and bar color FALSE and TRUE State -->
-        <item name="colorAccent">@color/colorInvalidVin</item>
-        <item name="colorControlNormal">@color/colorInvalidVin</item>
-        <item name="colorControlActivated">@color/colorInvalidVin</item>
+    <style name="SPStyle" parent="SublimePickerStyleLight">
+        <item name="spHeaderBackgroundPtr">@color/colorPrimary</item>
+        <item name="spHeaderBackground">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">#141414</item>
+        <item name="colorPrimary">#212121</item>
+        <item name="android:textColorPrimary">#212121</item>
+        <item name="android:textColorSecondary">#727272</item>
+        <item name="android:textColorPrimaryInverse">@color/colorPrimary</item>
     </style>
 
 </resources>

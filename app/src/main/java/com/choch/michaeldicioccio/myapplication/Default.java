@@ -4,14 +4,14 @@ package com.choch.michaeldicioccio.myapplication;
  * Created by michaeldicioccio on 9/13/17.
  */
 
-public enum Defaults {
+public enum Default {
 
-    DOUBLE_FORMAT("0.00");
-
+    DOUBLE_FORMAT("0.00"),
+    DATE_FORMAT("MM/dd/yyyy"),;
 
     final private Object object;
 
-    Defaults(Object object) {
+    Default(Object object) {
         this.object = object;
     }
 

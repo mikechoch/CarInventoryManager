@@ -3,23 +3,23 @@
     <string name="action_settings">Settings</string>
     <string name="action_flash">Flash</string>
 
-    <!--Cars Strings-->
-    <string name="bottom_bar_cars">Cars</string>
-    <string name="no_cars">No Cars</string>
+    <!--Vehicles Strings-->
+    <string name="bottom_bar_cars">Vehicles</string>
+    <string name="no_cars">No Vehicles</string>
     <string name="no_cars_image_view_content_description">
-        shown when no cars are in the cars fragment</string>
+        shown when no vehicles are in the vehicles fragment</string>
 
-    <!--Cars Sold Strings-->
+    <!--Vehicles Sold Strings-->
     <string name="bottom_bar_sold_cars">Sold</string>
-    <string name="no_sold_cars">No Cars</string>
+    <string name="no_sold_cars">No Vehicles</string>
     <string name="no_sold_cars_image_view_content_description">
-        shown when no sold cars are in the sold cars fragment</string>
+        shown when no sold vehicles are in the sold vehicles fragment</string>
 
-    <!--History Strings-->
-    <string name="bottom_bar_all_cars">All</string>
-    <string name="no_all_cars">No Cars</string>
-    <string name="no_all_cars_image_view_content_description">
-        shown when no all cars is in the all cars fragment</string>
+    <!--All Vehicles Strings-->
+    <string name="bottom_bar_all_vehicles">All</string>
+    <string name="no_all_vehicles">No Vehicles</string>
+    <string name="no_all_vehicles_image_view_content_description">
+        shown when no all vehicles is in the all vehicles fragment</string>
 
     <!--Scanner Strings-->
     <string name="navigation_scan">Scan</string>

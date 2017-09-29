@@ -6,10 +6,10 @@ package com.choch.michaeldicioccio.myapplication;
 
 public enum MessageStrings {
 
-    INVALID_VIN_LENGTH("Vin numbers are 17 chars long"),
-    INVALID_VIN_BARCODE_FORMAT("Invalid barcode type"),
-    VIN_ALREADY_SCANNED("Vin number already stored"),
-    INVALID_VIN("Vin number invalid");
+    INVALID_VIN_LENGTH("Invalid barcode"),
+    INVALID_VIN_BARCODE_FORMAT("Invalid barcode"),
+    VIN_ALREADY_SCANNED("Vehicle already exists"),
+    INVALID_VIN("Vehicle vin number invalid");
 
     final private String message;
 

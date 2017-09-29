@@ -66,35 +66,56 @@
                 android:hint="Price"
                 android:textColor="@color/colorIconNotActivated"
                 android:maxLines="1"
-                android:maxLength="12"
+                android:maxLength="15"
                 android:longClickable="false"/>
 
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/type_date_bought_text_input_layout"
+        <RelativeLayout
+            android:id="@+id/type_date_bought_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/type_price_text_input_layout"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
+            android:layout_marginEnd="16dp"
+            android:layout_below="@id/type_price_text_input_layout">
 
-            <EditText
-                android:id="@+id/type_date_bought_edit_text"
+            <TextView
+                android:id="@+id/type_clear_date_bought_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="8dp"
+                android:text="CLEAR"
+                android:textStyle="bold"
+                android:textColor="@color/text_color_selector"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/type_date_bought_text_input_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Date Bought"
-                android:textColor="@color/colorIconNotActivated"
-                android:maxLines="1"
-                android:longClickable="false"/>
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true">
 
-        </android.support.design.widget.TextInputLayout>
+                <EditText
+                    android:id="@+id/type_date_bought_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Date Bought"
+                    android:textColor="@color/colorIconNotActivated"
+                    android:maxLines="1"
+                    android:inputType="date"
+                    android:longClickable="false"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+        </RelativeLayout>
 
         <android.support.v7.widget.CardView
             android:id="@+id/add_vehicle_button_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/type_date_bought_text_input_layout"
+            android:layout_below="@id/type_date_bought_linear_layout"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="24dp"
             android:layout_marginStart="16dp"

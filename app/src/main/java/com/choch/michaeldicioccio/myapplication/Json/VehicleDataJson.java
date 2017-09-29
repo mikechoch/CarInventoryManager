@@ -1,6 +1,7 @@
 package com.choch.michaeldicioccio.myapplication.Json;
 
 import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
+import com.choch.michaeldicioccio.myapplication.Vehicle.VehicleBuyer;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Date;
 
 /**
  * Created by michaeldicioccio on 9/9/17.
@@ -20,10 +22,12 @@ public class VehicleDataJson {
 
     private String json_url;
     private String price_paid;
+    private Date date_bought;
 
-    public VehicleDataJson(String json_url, String price_paid) {
+    public VehicleDataJson(String json_url, String price_paid, Date date_bought) {
         this.json_url = json_url;
         this.price_paid = price_paid;
+        this.date_bought = date_bought;
     }
 
     public Vehicle decodeVinNumber() throws IOException, JSONException {
@@ -55,7 +59,10 @@ public class VehicleDataJson {
             vehicle.setStyle(jsonVehicleAttributes.getString(VehicleJsonAttributes.STYLE.getString()));
             vehicle.setEngine(jsonVehicleAttributes.getString(VehicleJsonAttributes.ENGINE.getString()));
 
+            vehicle.setVehicleBuyer(new VehicleBuyer());
+
             vehicle.setPricePaid(Double.parseDouble(price_paid));
+            vehicle.setBuyDate(date_bought);
 
             vehicle.setSold(false);
 

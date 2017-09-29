@@ -9,11 +9,10 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.choch.michaeldicioccio.myapplication.Defaults;
+import com.choch.michaeldicioccio.myapplication.Default;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +20,14 @@ import java.util.List;
 
 public class CustomExpensesRecyclerViewAdapter extends RecyclerView.Adapter<CustomExpensesRecyclerViewAdapter.MyViewHolder> {
 
+    /* Globals */
     private Context context;
     private ArrayList<Expense> expenseArrayList;
     private RecyclerViewClickListener listener;
     private SparseBooleanArray selectedItems;
     private boolean actionModeEnabled = false;
 
-    private DecimalFormat df = new DecimalFormat(Defaults.DOUBLE_FORMAT.getObject().toString());
+    private DecimalFormat df = new DecimalFormat(Default.DOUBLE_FORMAT.getObject().toString());
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public View view;
@@ -65,7 +65,7 @@ public class CustomExpensesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         final Expense expense = expenseArrayList.get(position);
 
         holder.itemTitleTextView.setText(expense.getTitle());
-        holder.itemPriceTextView.setText(df.format(expense.getPrice()));
+        holder.itemPriceTextView.setText(("$" + df.format(expense.getPrice())));
 
         // apply click events
         applyClickEvents(holder, position);

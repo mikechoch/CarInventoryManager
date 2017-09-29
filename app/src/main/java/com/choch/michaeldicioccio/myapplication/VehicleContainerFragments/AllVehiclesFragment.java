@@ -1,5 +1,6 @@
-package com.choch.michaeldicioccio.myapplication.CarContainerFragments;
+package com.choch.michaeldicioccio.myapplication.VehicleContainerFragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,10 +20,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.choch.michaeldicioccio.myapplication.Activities.VehicleDetailActivity;
-import com.choch.michaeldicioccio.myapplication.Vehicle.CustomCarsRecyclerViewAdapter;
+import com.choch.michaeldicioccio.myapplication.Sorting;
+import com.choch.michaeldicioccio.myapplication.Vehicle.CustomVehiclesRecyclerViewAdapter;
 import com.choch.michaeldicioccio.myapplication.Activities.MainActivity;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
@@ -33,22 +36,26 @@ import java.util.ArrayList;
 import io.realm.Realm;
 
 
-public class AllCarsFragment extends Fragment {
+public class AllVehiclesFragment extends Fragment {
 
     /* Attributes */
     private Realm realm;
 
-    private ArrayList<Vehicle> allCarsArrayList;
+    private Sorting sorting;
+    private ArrayList<Vehicle> allVehiclesArrayList;
 
-    private RecyclerView allCarsRecyclerView;
-    private RelativeLayout noAllCarsRelativeLayout;
+    private RecyclerView allVehiclesRecyclerView;
+    private RelativeLayout noAllVehiclesRelativeLayout;
+
+    private TextView sortButtonTextView, vehicleCountTextView;
+    private RelativeLayout sortButtonRelativeLayout;
 
     public static Toolbar toolbar;
     public static DrawerLayout drawer;
     public static ActionBarDrawerToggle toggle;
-    public static CustomCarsRecyclerViewAdapter customAllCarsRecyclerViewAdapter;
+    public static CustomVehiclesRecyclerViewAdapter customAllVehiclesRecyclerViewAdapter;
 
-    public AllCarsFragment() {
+    public AllVehiclesFragment() {
     }
 
     @Override
@@ -58,7 +65,7 @@ public class AllCarsFragment extends Fragment {
                 return true;
 
             case R.id.action_delete:
-                if (customAllCarsRecyclerViewAdapter.getSelectedItemCount() > 0) {
+                if (customAllVehiclesRecyclerViewAdapter.getSelectedItemCount() > 0) {
                     //alert for confirm to delete
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     //set message
@@ -68,22 +75,24 @@ public class AllCarsFragment extends Fragment {
                     builder.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int which) {
-                            customAllCarsRecyclerViewAdapter.setActionMode(false);
+                            customAllVehiclesRecyclerViewAdapter.setActionMode(false);
                             realm.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
-                                    for (int position : customAllCarsRecyclerViewAdapter
+                                    for (int position : customAllVehiclesRecyclerViewAdapter
                                             .getSelectedItems()) {
                                         realm.where(Vehicle.class).findAll().deleteFromRealm(
                                                 position);
-                                        customAllCarsRecyclerViewAdapter.removeAt(position);
+                                        customAllVehiclesRecyclerViewAdapter.removeAt(position);
                                     }
                                 }
                             });
 
+                            vehicleCountTextView.setText("Vehicles (" + allVehiclesArrayList.size() + ")");
+
                             MainActivity.checkArrayIsZeroDisplayZeroIcon(
-                                    allCarsArrayList.size(),
-                                    noAllCarsRelativeLayout);
+                                    allVehiclesArrayList.size(),
+                                    noAllVehiclesRelativeLayout);
 
                             updateToolbarOnBackPressed(deactivateActionMode());
                             dialogInterface.dismiss();
@@ -126,7 +135,7 @@ public class AllCarsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.all_cars_fragment_layout, container, false);
+        View view = inflater.inflate(R.layout.all_vehicles_fragment_layout, container, false);
 
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
 
@@ -139,23 +148,46 @@ public class AllCarsFragment extends Fragment {
 
         Realm.init(getActivity());
         realm = Realm.getDefaultInstance();
-        allCarsArrayList = new ArrayList<>(realm.where(Vehicle.class).findAll());
+        allVehiclesArrayList = new ArrayList<>(realm.copyFromRealm(realm.where(Vehicle.class)
+                .findAll()));
 
-        noAllCarsRelativeLayout = (RelativeLayout)
+        sorting = realm.where(Sorting.class).findFirst();
+
+        vehicleCountTextView = (TextView) view.findViewById(R.id.vehicle_count_text_view);
+        vehicleCountTextView.setText("Vehicles (" + allVehiclesArrayList.size() + ")");
+        sortButtonTextView = (TextView) view.findViewById(R.id.sort_text_view);
+        sortButtonRelativeLayout = (RelativeLayout) view.findViewById(R.id.sort_button);
+
+        sortButtonTextView.setText(sorting.getSortType());
+        sortButtonRelativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog sortAlertDialog = sorting.createSortAlertDialog(getActivity());
+                sortAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        sortRecyclerView();
+                    }
+                });
+                sortAlertDialog.show();
+            }
+        });
+
+        noAllVehiclesRelativeLayout = (RelativeLayout)
                 view.findViewById(R.id.no_all_cars_relative_layout);
 
         MainActivity.checkArrayIsZeroDisplayZeroIcon(
-                allCarsArrayList.size(),
-                noAllCarsRelativeLayout);
+                allVehiclesArrayList.size(),
+                noAllVehiclesRelativeLayout);
 
-        allCarsRecyclerView = (RecyclerView) view.findViewById(R.id.all_cars_recycler_view);
-        customAllCarsRecyclerViewAdapter = new CustomCarsRecyclerViewAdapter(
+        allVehiclesRecyclerView = (RecyclerView) view.findViewById(R.id.all_cars_recycler_view);
+        customAllVehiclesRecyclerViewAdapter = new CustomVehiclesRecyclerViewAdapter(
                 getActivity(),
-                allCarsArrayList,
+                allVehiclesArrayList,
                 new RecyclerViewClickListener() {
                     @Override
                     public void onClick(View view, int position) {
-                        if (!customAllCarsRecyclerViewAdapter.isActionModeEnabled()) {
+                        if (!customAllVehiclesRecyclerViewAdapter.isActionModeEnabled()) {
                             startVehicleDetailActivity(position);
                         } else {
                             checkedSelectedCount(false);
@@ -170,19 +202,52 @@ public class AllCarsFragment extends Fragment {
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
 
-        allCarsRecyclerView.setLayoutManager(mLayoutManager);
-        allCarsRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        allVehiclesRecyclerView.setLayoutManager(mLayoutManager);
+        allVehiclesRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        allCarsRecyclerView.setAdapter(customAllCarsRecyclerViewAdapter);
+        allVehiclesRecyclerView.setAdapter(customAllVehiclesRecyclerViewAdapter);
+        sortRecyclerView();
+
         updateToolbarOnBackPressed(deactivateActionMode());
 
         return view;
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 202) {
+            if (resultCode == Activity.RESULT_OK) {
+                allVehiclesArrayList = new ArrayList<>(realm.copyFromRealm(realm.where(Vehicle.class)
+                        .findAll()));
+                customAllVehiclesRecyclerViewAdapter.setDataSet(allVehiclesArrayList);
+                sortRecyclerView();
+            }
+
+            if (resultCode == Activity.RESULT_CANCELED) {
+
+            }
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         realm.close();
+    }
+
+    private void sortRecyclerView() {
+        switch(sorting.getSortIndex()) {
+            case 0:
+                customAllVehiclesRecyclerViewAdapter.sortDataSetByMake();
+                break;
+            case 1:
+                customAllVehiclesRecyclerViewAdapter.sortDataSetByModel();
+                break;
+            case 2:
+                customAllVehiclesRecyclerViewAdapter.sortDataSetByDate();
+                break;
+        }
+        sortButtonTextView.setText(sorting.getSortType());
     }
 
     private void updateToolbarOnBackPressed(Toolbar toolbar) {
@@ -197,22 +262,22 @@ public class AllCarsFragment extends Fragment {
     }
 
     public static Toolbar deactivateActionMode() {
-        customAllCarsRecyclerViewAdapter.setActionMode(false);
-        customAllCarsRecyclerViewAdapter.clearSelections();
+        customAllVehiclesRecyclerViewAdapter.setActionMode(false);
+        customAllVehiclesRecyclerViewAdapter.clearSelections();
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(null);
-        toolbar.setTitle("All Cars");
+        toolbar.setTitle("All Vehicles");
         toolbar.inflateMenu(R.menu.main_menu);
 
         return toolbar;
     }
 
     private void activateActionMode() {
-        customAllCarsRecyclerViewAdapter.setActionMode(true);
+        customAllVehiclesRecyclerViewAdapter.setActionMode(true);
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(R.mipmap.ic_arrow_left_white_24dp);
         toolbar.setTitle("");
-        toolbar.inflateMenu(R.menu.all_cars_action_menu);
+        toolbar.inflateMenu(R.menu.all_vehicles_action_menu);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -222,8 +287,8 @@ public class AllCarsFragment extends Fragment {
     }
 
     private void checkedSelectedCount(boolean long_clicked) {
-        if (customAllCarsRecyclerViewAdapter.isActionModeEnabled()) {
-            if (customAllCarsRecyclerViewAdapter.getSelectedItemCount() == 0) {
+        if (customAllVehiclesRecyclerViewAdapter.isActionModeEnabled()) {
+            if (customAllVehiclesRecyclerViewAdapter.getSelectedItemCount() == 0) {
                 updateToolbarOnBackPressed(deactivateActionMode());
             }
         } else {
@@ -235,8 +300,8 @@ public class AllCarsFragment extends Fragment {
 
     private void startVehicleDetailActivity(int position) {
         Intent vehicleDetailIntent = new Intent(getActivity().getApplicationContext(), VehicleDetailActivity.class);
-        vehicleDetailIntent.putExtra("vin", allCarsArrayList.get(position).getVin());
-        startActivity(vehicleDetailIntent);
+        vehicleDetailIntent.putExtra("vin", allVehiclesArrayList.get(position).getVin());
+        startActivityForResult(vehicleDetailIntent, 202);
     }
 
     private void toast(String toast_string) {

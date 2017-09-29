@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Add Car">
+    <item android:title="Add Vehicle">
         <menu>
             <item
                 android:id="@+id/nav_type_car"
@@ -14,7 +14,7 @@
         </menu>
     </item>
 
-    <item android:title="Cars">
+    <item android:title="Vehicles">
         <menu>
             <group android:checkableBehavior="single">
                 <item
@@ -24,11 +24,11 @@
                 <item
                     android:id="@+id/nav_sold_cars"
                     android:icon="@mipmap/ic_cash_usd_white_24dp"
-                    android:title="Sold Cars" />
+                    android:title="Sold Vehicles" />
                 <item
                     android:id="@+id/nav_all_cars"
                     android:icon="@mipmap/ic_history_black_24dp"
-                    android:title="All Cars" />
+                    android:title="All Vehicles" />
             </group>
         </menu>
     </item>

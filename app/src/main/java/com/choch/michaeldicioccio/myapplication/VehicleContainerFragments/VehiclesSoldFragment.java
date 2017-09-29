@@ -1,5 +1,6 @@
-package com.choch.michaeldicioccio.myapplication.CarContainerFragments;
+package com.choch.michaeldicioccio.myapplication.VehicleContainerFragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,38 +23,44 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.choch.michaeldicioccio.myapplication.Activities.VehicleDetailActivity;
-import com.choch.michaeldicioccio.myapplication.Vehicle.CustomCarsRecyclerViewAdapter;
+import com.choch.michaeldicioccio.myapplication.Sorting;
+import com.choch.michaeldicioccio.myapplication.Vehicle.CustomVehiclesRecyclerViewAdapter;
 import com.choch.michaeldicioccio.myapplication.Activities.MainActivity;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
 import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
+import com.choch.michaeldicioccio.myapplication.Vehicle.VehicleBuyer;
 
 import java.util.ArrayList;
 
 import io.realm.Realm;
 
 
-public class CarsSoldFragment extends Fragment {
+public class VehiclesSoldFragment extends Fragment {
 
     /* Attributes */
     private Realm realm;
 
-    private static ArrayList<Vehicle> carsSoldArrayList;
+    private Sorting sorting;
+    private static ArrayList<Vehicle> vehiclesSoldArrayList;
 
-    private RecyclerView carsSoldRecyclerView;
-    private RelativeLayout noCarsSoldRelativeLayout;
-    private Snackbar undoSwipeSnackbar;
+    private RecyclerView vehiclesSoldRecyclerView;
+    private RelativeLayout noVehiclesSoldRelativeLayout;
+
+    private TextView sortButtonTextView, vehicleCountTextView;
+    private RelativeLayout sortButtonRelativeLayout;
 
     public static Toolbar toolbar;
     public static DrawerLayout drawer;
     public static ActionBarDrawerToggle toggle;
-    public static CustomCarsRecyclerViewAdapter customCarsSoldRecyclerViewAdapter;
+    public static CustomVehiclesRecyclerViewAdapter customVehiclesSoldRecyclerViewAdapter;
 
 
-    public CarsSoldFragment() {
+    public VehiclesSoldFragment() {
     }
 
     //    @Override
@@ -64,7 +71,7 @@ public class CarsSoldFragment extends Fragment {
 
             case R.id.action_move_to_cars:
                 //alert for confirm to move
-                if (customCarsSoldRecyclerViewAdapter.getSelectedItemCount() > 0) {
+                if (customVehiclesSoldRecyclerViewAdapter.getSelectedItemCount() > 0) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     //set message
                     builder.setMessage("Are you sure you want to move the selected cars?");
@@ -73,22 +80,30 @@ public class CarsSoldFragment extends Fragment {
                     builder.setPositiveButton("MOVE", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int which) {
-                            customCarsSoldRecyclerViewAdapter.setActionMode(false);
+                            customVehiclesSoldRecyclerViewAdapter.setActionMode(false);
                             realm.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
-                                    for (int position : customCarsSoldRecyclerViewAdapter
+                                    for (int position : customVehiclesSoldRecyclerViewAdapter
                                             .getSelectedItems()) {
-                                        realm.where(Vehicle.class).equalTo("sold", true).findAll()
-                                                .get(position).setSold(false);
-                                        customCarsSoldRecyclerViewAdapter.removeAt(position);
+                                        Vehicle vehicle = realm.where(Vehicle.class)
+                                                .equalTo("sold", true).findAll().get(position);
+                                        vehicle.setSold(false);
+                                        vehicle.setSellDate(null);
+                                        vehicle.setSoldPriceBeenSetBefore(false);
+                                        vehicle.getVehicleBuyer().setName("");
+                                        vehicle.getVehicleBuyer().setPhoneNumber("");
+                                        vehicle.getVehicleBuyer().setEmail("");
+                                        customVehiclesSoldRecyclerViewAdapter.removeAt(position);
                                     }
                                 }
                             });
 
+                            vehicleCountTextView.setText("Vehicles (" + vehiclesSoldArrayList.size() + ")");
+
                             MainActivity.checkArrayIsZeroDisplayZeroIcon(
-                                    carsSoldArrayList.size(),
-                                    noCarsSoldRelativeLayout);
+                                    vehiclesSoldArrayList.size(),
+                                    noVehiclesSoldRelativeLayout);
 
                             updateToolbarOnBackPressed(deactivateActionMode());
                             dialogInterface.dismiss();
@@ -118,7 +133,7 @@ public class CarsSoldFragment extends Fragment {
                 return true;
 
             case R.id.action_delete:
-                if (customCarsSoldRecyclerViewAdapter.getSelectedItemCount() > 0) {
+                if (customVehiclesSoldRecyclerViewAdapter.getSelectedItemCount() > 0) {
                     //alert for confirm to delete
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     //set message
@@ -128,22 +143,24 @@ public class CarsSoldFragment extends Fragment {
                     builder.setPositiveButton("DELETE", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int which) {
-                            customCarsSoldRecyclerViewAdapter.setActionMode(false);
+                            customVehiclesSoldRecyclerViewAdapter.setActionMode(false);
                             realm.executeTransaction(new Realm.Transaction() {
                                 @Override
                                 public void execute(Realm realm) {
-                                    for (int position : customCarsSoldRecyclerViewAdapter
+                                    for (int position : customVehiclesSoldRecyclerViewAdapter
                                             .getSelectedItems()) {
                                         realm.where(Vehicle.class).equalTo("sold", true).findAll()
                                                 .deleteFromRealm(position);
-                                        customCarsSoldRecyclerViewAdapter.removeAt(position);
+                                        customVehiclesSoldRecyclerViewAdapter.removeAt(position);
                                     }
                                 }
                             });
 
+                            vehicleCountTextView.setText("Vehicles (" + vehiclesSoldArrayList.size() + ")");
+
                             MainActivity.checkArrayIsZeroDisplayZeroIcon(
-                                    carsSoldArrayList.size(),
-                                    noCarsSoldRelativeLayout);
+                                    vehiclesSoldArrayList.size(),
+                                    noVehiclesSoldRelativeLayout);
 
                             updateToolbarOnBackPressed(deactivateActionMode());
                             dialogInterface.dismiss();
@@ -186,7 +203,7 @@ public class CarsSoldFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.cars_sold_fragment_layout, container, false);
+        View view = inflater.inflate(R.layout.vehicles_sold_fragment_layout, container, false);
 
         toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
 
@@ -199,24 +216,47 @@ public class CarsSoldFragment extends Fragment {
 
         Realm.init(getActivity());
         realm = Realm.getDefaultInstance();
-        carsSoldArrayList = new ArrayList<>(realm.where(Vehicle.class).equalTo("sold", true)
-                .findAll());
+        vehiclesSoldArrayList = new ArrayList<>(realm.copyFromRealm(realm.where(Vehicle.class)
+                .equalTo("sold", true)
+                .findAll()));
 
-        noCarsSoldRelativeLayout = (RelativeLayout)
+        sorting = realm.where(Sorting.class).findFirst();
+
+        vehicleCountTextView = (TextView) view.findViewById(R.id.vehicle_count_text_view);
+        vehicleCountTextView.setText("Vehicles (" + vehiclesSoldArrayList.size() + ")");
+        sortButtonTextView = (TextView) view.findViewById(R.id.sort_text_view);
+        sortButtonRelativeLayout = (RelativeLayout) view.findViewById(R.id.sort_button);
+
+        sortButtonTextView.setText(sorting.getSortType());
+        sortButtonRelativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog sortAlertDialog = sorting.createSortAlertDialog(getActivity());
+                sortAlertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        sortRecyclerView();
+                    }
+                });
+                sortAlertDialog.show();
+            }
+        });
+
+        noVehiclesSoldRelativeLayout = (RelativeLayout)
                 view.findViewById(R.id.no_cars_sold_relative_layout);
 
         MainActivity.checkArrayIsZeroDisplayZeroIcon(
-                carsSoldArrayList.size(),
-                noCarsSoldRelativeLayout);
+                vehiclesSoldArrayList.size(),
+                noVehiclesSoldRelativeLayout);
 
-        carsSoldRecyclerView = (RecyclerView) view.findViewById(R.id.cars_sold_recycler_view);
-        customCarsSoldRecyclerViewAdapter = new CustomCarsRecyclerViewAdapter(
+        vehiclesSoldRecyclerView = (RecyclerView) view.findViewById(R.id.cars_sold_recycler_view);
+        customVehiclesSoldRecyclerViewAdapter = new CustomVehiclesRecyclerViewAdapter(
                 getActivity(),
-                carsSoldArrayList,
+                vehiclesSoldArrayList,
                 new RecyclerViewClickListener() {
                     @Override
                     public void onClick(View view, int position) {
-                        if (!customCarsSoldRecyclerViewAdapter.isActionModeEnabled()) {
+                        if (!customVehiclesSoldRecyclerViewAdapter.isActionModeEnabled()) {
                             startVehicleDetailActivity(position);
                         } else {
                             checkedSelectedCount(false);
@@ -231,8 +271,8 @@ public class CarsSoldFragment extends Fragment {
         RecyclerView.LayoutManager mLayoutManager =
                 new LinearLayoutManager(getActivity().getApplicationContext());
 
-        carsSoldRecyclerView.setLayoutManager(mLayoutManager);
-        carsSoldRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        vehiclesSoldRecyclerView.setLayoutManager(mLayoutManager);
+        vehiclesSoldRecyclerView.setItemAnimator(new DefaultItemAnimator());
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(
                 0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -248,24 +288,30 @@ public class CarsSoldFragment extends Fragment {
             public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition();
                 if (direction == ItemTouchHelper.LEFT | direction == ItemTouchHelper.RIGHT) {
-                    final String vin = carsSoldArrayList.get(position).getVin();
-                    //TODO: update data on swipe
-                    final Vehicle[] vehicle = {new Vehicle()};
+                    final String vin = customVehiclesSoldRecyclerViewAdapter.getVehicleAt(position).getVin();
+                    final Vehicle[] vehicle = {new Vehicle(), new Vehicle()};
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
-                            vehicle[0] = realm.where(Vehicle.class).equalTo("sold", true).findAll()
-                                    .get(position);
-                            realm.where(Vehicle.class).equalTo("sold", true).findAll().get(position)
-                                    .setSold(false);
-                            customCarsSoldRecyclerViewAdapter.removeAt(position);
+                            vehicle[0] = realm.where(Vehicle.class).equalTo("vin", vin).findFirst();
+                            vehicle[1] = realm.copyFromRealm(vehicle[0]);
+                            vehicle[0].setSold(false);
+                            vehicle[0].setSellDate(null);
+                            vehicle[0].setSoldPriceBeenSetBefore(false);
+                            vehicle[0].getVehicleBuyer().setName("");
+                            vehicle[0].getVehicleBuyer().setPhoneNumber("");
+                            vehicle[0].getVehicleBuyer().setEmail("");
+
+                            customVehiclesSoldRecyclerViewAdapter.removeAt(position);
                             checkedSelectedCount(false);
                         }
                     });
 
+                    vehicleCountTextView.setText("Vehicles (" + vehiclesSoldArrayList.size() + ")");
+
                     MainActivity.checkArrayIsZeroDisplayZeroIcon(
-                            carsSoldArrayList.size(),
-                            noCarsSoldRelativeLayout);
+                            vehiclesSoldArrayList.size(),
+                            noVehiclesSoldRelativeLayout);
 
                     CoordinatorLayout mainCoordinateLayout =
                             (CoordinatorLayout)
@@ -281,17 +327,21 @@ public class CarsSoldFragment extends Fragment {
                                         realm.executeTransaction(new Realm.Transaction() {
                                             @Override
                                             public void execute(Realm realm) {
-                                                realm.where(Vehicle.class).equalTo("sold", false)
-                                                        .equalTo("vin", vehicle[0].getVin())
-                                                        .findFirst()
-                                                        .setSold(true);
-                                                customCarsSoldRecyclerViewAdapter.addAt(position, vehicle[0]);
+                                                vehicle[0].setSold(true);
+                                                vehicle[0].setSellDate(vehicle[1].getSellDate());
+                                                vehicle[0].setPriceSold(vehicle[1].getPriceSold());
+                                                vehicle[0].getVehicleBuyer().setName(vehicle[1].getVehicleBuyer().getName());
+                                                vehicle[0].getVehicleBuyer().setPhoneNumber(vehicle[1].getVehicleBuyer().getPhoneNumber());
+                                                vehicle[0].getVehicleBuyer().setEmail(vehicle[1].getVehicleBuyer().getEmail());
+                                                customVehiclesSoldRecyclerViewAdapter.addAt(position, vehicle[0]);
                                             }
                                         });
 
+                                        vehicleCountTextView.setText("Vehicles (" + vehiclesSoldArrayList.size() + ")");
+
                                         MainActivity.checkArrayIsZeroDisplayZeroIcon(
-                                                carsSoldArrayList.size(),
-                                                noCarsSoldRelativeLayout);
+                                                vehiclesSoldArrayList.size(),
+                                                noVehiclesSoldRelativeLayout);
                                     }
                                 }
                             })
@@ -301,18 +351,52 @@ public class CarsSoldFragment extends Fragment {
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
-        itemTouchHelper.attachToRecyclerView(carsSoldRecyclerView); //set swipe to recylcerview
+        itemTouchHelper.attachToRecyclerView(vehiclesSoldRecyclerView); //set swipe to recylcerview
 
-        carsSoldRecyclerView.setAdapter(customCarsSoldRecyclerViewAdapter);
+        vehiclesSoldRecyclerView.setAdapter(customVehiclesSoldRecyclerViewAdapter);
+        sortRecyclerView();
+
         updateToolbarOnBackPressed(deactivateActionMode());
 
         return view;
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 201) {
+            if (resultCode == Activity.RESULT_OK) {
+                vehiclesSoldArrayList = new ArrayList<>(realm.copyFromRealm(realm.where(Vehicle.class)
+                        .equalTo("sold", true)
+                        .findAll()));
+                customVehiclesSoldRecyclerViewAdapter.setDataSet(vehiclesSoldArrayList);
+                sortRecyclerView();
+            }
+
+            if (resultCode == Activity.RESULT_CANCELED) {
+
+            }
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         realm.close();
+    }
+
+    private void sortRecyclerView() {
+        switch(sorting.getSortIndex()) {
+            case 0:
+                customVehiclesSoldRecyclerViewAdapter.sortDataSetByMake();
+                break;
+            case 1:
+                customVehiclesSoldRecyclerViewAdapter.sortDataSetByModel();
+                break;
+            case 2:
+                customVehiclesSoldRecyclerViewAdapter.sortDataSetByDate();
+                break;
+        }
+        sortButtonTextView.setText(sorting.getSortType());
     }
 
     private void updateToolbarOnBackPressed(Toolbar toolbar) {
@@ -327,23 +411,22 @@ public class CarsSoldFragment extends Fragment {
     }
 
     public static Toolbar deactivateActionMode() {
-        customCarsSoldRecyclerViewAdapter.setActionMode(false);
-        customCarsSoldRecyclerViewAdapter.clearSelections();
+        customVehiclesSoldRecyclerViewAdapter.setActionMode(false);
+        customVehiclesSoldRecyclerViewAdapter.clearSelections();
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(null);
-        toolbar.setTitle("Sold Cars");
+        toolbar.setTitle("Sold Vehicles");
         toolbar.inflateMenu(R.menu.main_menu);
 
         return toolbar;
     }
 
     private void activateActionMode() {
-        customCarsSoldRecyclerViewAdapter.setActionMode(true);
-        customCarsSoldRecyclerViewAdapter.notifyDataSetChanged();
+        customVehiclesSoldRecyclerViewAdapter.setActionMode(true);
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(R.mipmap.ic_arrow_left_white_24dp);
         toolbar.setTitle("");
-        toolbar.inflateMenu(R.menu.sold_cars_action_menu);
+        toolbar.inflateMenu(R.menu.sold_vehicles_action_menu);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -353,9 +436,8 @@ public class CarsSoldFragment extends Fragment {
     }
 
     private void checkedSelectedCount(boolean long_clicked) {
-        if (customCarsSoldRecyclerViewAdapter.isActionModeEnabled()) {
-            if (customCarsSoldRecyclerViewAdapter.getSelectedItemCount() == 0) {
-                updateToolbarOnBackPressed(deactivateActionMode());
+        if (customVehiclesSoldRecyclerViewAdapter.isActionModeEnabled()) {
+            if (customVehiclesSoldRecyclerViewAdapter.getSelectedItemCount() == 0) {
                 updateToolbarOnBackPressed(deactivateActionMode());
             }
         } else {
@@ -367,8 +449,8 @@ public class CarsSoldFragment extends Fragment {
 
     private void startVehicleDetailActivity(int position) {
         Intent vehicleDetailIntent = new Intent(getActivity().getApplicationContext(), VehicleDetailActivity.class);
-        vehicleDetailIntent.putExtra("vin", carsSoldArrayList.get(position).getVin());
-        startActivity(vehicleDetailIntent);
+        vehicleDetailIntent.putExtra("vin", vehiclesSoldArrayList.get(position).getVin());
+        startActivityForResult(vehicleDetailIntent, 201);
     }
 
     private void toast(String toast_string) {

@@ -1,10 +1,14 @@
 package com.choch.michaeldicioccio.myapplication.Activities;
 
 import android.animation.LayoutTransition;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -22,28 +26,41 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.choch.michaeldicioccio.myapplication.Defaults;
+import com.appeaser.sublimepickerlibrary.datepicker.SelectedDate;
+import com.appeaser.sublimepickerlibrary.helpers.SublimeOptions;
+import com.appeaser.sublimepickerlibrary.recurrencepicker.SublimeRecurrencePicker;
+import com.choch.michaeldicioccio.myapplication.Default;
 import com.choch.michaeldicioccio.myapplication.Json.VehicleDataJson;
 import com.choch.michaeldicioccio.myapplication.Json.VinErrorCheck;
-import com.choch.michaeldicioccio.myapplication.MessageStrings;
 import com.choch.michaeldicioccio.myapplication.R;
+import com.choch.michaeldicioccio.myapplication.SublimePickerFragment;
 import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
 
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import io.realm.Realm;
 
 
 public class TypeVinActivity extends AppCompatActivity {
 
+    /* Globals */
     private Realm realm;
 
-    private EditText vinEditText, priceEditText;
-    private TextInputLayout vinTextInputLayout, priceTextInputLayout;
+    private Date date = new Date();
+
+    private TextView clearDateBoughtTextView;
+    private EditText vinEditText, priceEditText, dateBoughtEditText;
+    private TextInputLayout vinTextInputLayout, priceTextInputLayout, dateBoughtTextInputLayout;
     private RelativeLayout keyboardAlphaNumericRelativeLayout, keyboardCurrencyRelativeLayout;
+    CoordinatorLayout typeVinCoordinateLayout;
 
     private LayoutTransition layoutDisappearingTransition, layoutAppearingTransition;
 
@@ -53,12 +70,13 @@ public class TypeVinActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private FrameLayout frameLayout;
 
-    private DecimalFormat df = new DecimalFormat(Defaults.DOUBLE_FORMAT.getObject().toString());
+    private DecimalFormat df = new DecimalFormat(Default.DOUBLE_FORMAT.getObject().toString());
+    private DateFormat dateFormat = new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString(), Locale.US);
 
 
     /**
-     *
-     * @param item
+     * creates the actions for each item in the actionbar/toolbar menu
+     * @param item - current item selected
      * @return
      */
     @Override
@@ -74,6 +92,11 @@ public class TypeVinActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * method called to perform basic application startup logic that should happen only once
+     * for the entire life of the activity
+     * @param savedInstanceState - access for cached variables
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,8 +110,7 @@ public class TypeVinActivity extends AppCompatActivity {
         Realm.init(this);
         realm = Realm.getDefaultInstance();
 
-        keyboardAlphaNumericRelativeLayout = (RelativeLayout) findViewById(R.id.alpha_numeric_keyboard_relative_layout);
-        keyboardCurrencyRelativeLayout = (RelativeLayout) findViewById(R.id.currency_keyboard_relative_layout);
+        typeVinCoordinateLayout = (CoordinatorLayout) findViewById(R.id.type_vin_coordinate_layout);
 
         layoutDisappearingTransition = new LayoutTransition();
         layoutDisappearingTransition.setDuration(LayoutTransition.DISAPPEARING, 100);
@@ -96,33 +118,7 @@ public class TypeVinActivity extends AppCompatActivity {
         layoutAppearingTransition = new LayoutTransition();
         layoutAppearingTransition.setDuration(LayoutTransition.APPEARING, 100);
 
-        addVehicleButtonContainer = (CardView) findViewById(R.id.add_vehicle_button_container);
-        addVehicleButton = (RelativeLayout) findViewById(R.id.add_vehicle_button);
-        addVehicleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String vin = vinEditText.getText().toString();
-
-                VinErrorCheck vinErrorCheck = new VinErrorCheck(vin);
-
-                if (vinErrorCheck.verifyVinLength(vin)) {
-                    vin = vinErrorCheck.getVin();
-
-                    if (realm.where(Vehicle.class).equalTo("vin", vin).findFirst() == null) {
-                        String[] vinParams = {vin, priceEditText.getText().toString()};
-                        new VinCheckTask().execute(vinParams);
-
-                    } else {
-                        vinTextInputLayout.setError("Enter a valid vin");
-                        vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-                    }
-                } else {
-                    vinTextInputLayout.setError("Enter a valid vin");
-                    vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-                }
-            }
-        });
-
+        setupAddVehicleButton();
         setupKeyboardConnectionToEditText();
         setupKeyboardAlphaNumericKeyListeners();
         setupKeyboardCurrencyKeyListeners();
@@ -134,7 +130,8 @@ public class TypeVinActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * handles on back pressed
+     * back press closes returns to previous activity
      */
     @Override
     public void onBackPressed() {
@@ -142,8 +139,64 @@ public class TypeVinActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * checks whether network connection is available or not
+     * @return - boolean signifying network connection or not
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null;
+    }
+
+    /**
+     *
+     */
+    private void setupAddVehicleButton() {
+        addVehicleButtonContainer = (CardView) findViewById(R.id.add_vehicle_button_container);
+        addVehicleButton = (RelativeLayout) findViewById(R.id.add_vehicle_button);
+        addVehicleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String vin = vinEditText.getText().toString();
+
+                if (isNetworkAvailable()) {
+                    VinErrorCheck vinErrorCheck = new VinErrorCheck(vin);
+
+                    if (vinErrorCheck.verifyVinLength(vin)) {
+                        vin = vinErrorCheck.getVin();
+
+                        if (realm.where(Vehicle.class).equalTo("vin", vin).findFirst() == null) {
+                            String[] vinParams = {vin, priceEditText.getText().toString()};
+                            new VinCheckTask().execute(vinParams);
+
+                        } else {
+                            vinTextInputLayout.setError("Enter a valid vin");
+                            vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                        }
+                    } else {
+                        vinTextInputLayout.setError("Enter a valid vin");
+                        vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+                    }
+                } else {
+                    Snackbar.make(typeVinCoordinateLayout, "No connection", Snackbar.LENGTH_SHORT).setAction("RETRY", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            addVehicleButton.performClick();
+                        }
+                    }).show();
+                }
+            }
+        });
+    }
+
+    /**
+     * setup the connection between the custom keyboards and the edit texts
+     */
     private void setupKeyboardConnectionToEditText() {
-        CoordinatorLayout typeVinCoordinateLayout = (CoordinatorLayout) findViewById(R.id.type_vin_coordinate_layout);
+        keyboardAlphaNumericRelativeLayout = (RelativeLayout) findViewById(R.id.alpha_numeric_keyboard_relative_layout);
+        keyboardCurrencyRelativeLayout = (RelativeLayout) findViewById(R.id.currency_keyboard_relative_layout);
 
         vinTextInputLayout = (TextInputLayout) findViewById(R.id.type_vin_text_input_layout);
         vinEditText = (EditText) typeVinCoordinateLayout.findViewById(R.id.type_vin_edit_text);
@@ -170,6 +223,8 @@ public class TypeVinActivity extends AppCompatActivity {
                         vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
                     }
 
+                    keyboardAlphaNumericRelativeLayout.setVisibility(View.VISIBLE);
+                    keyboardCurrencyRelativeLayout.setVisibility(View.VISIBLE);
                     keyboardAlphaNumericRelativeLayout.setClickable(true);
                     keyboardAlphaNumericRelativeLayout.bringToFront();
                     keyboardCurrencyRelativeLayout.setClickable(false);
@@ -197,7 +252,7 @@ public class TypeVinActivity extends AppCompatActivity {
                     vinEditText.setSelection(vinEditText.getText().length());
                 }
 
-                if (vinEditText.getText().length() == 17 && priceEditText.getText().length() > 0) {
+                if (vinEditText.getText().length() == 17 && priceEditText.getText().length() > 0 && dateBoughtEditText.getText().length() > 0) {
                     addVehicleButtonContainer.setVisibility(View.VISIBLE);
                 } else {
                     addVehicleButtonContainer.setVisibility(View.GONE);
@@ -229,9 +284,16 @@ public class TypeVinActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
+                    keyboardCurrencyRelativeLayout.setVisibility(View.VISIBLE);
+                    keyboardAlphaNumericRelativeLayout.setVisibility(View.VISIBLE);
+
+                    priceEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_17_focus));
+
                     keyboardCurrencyRelativeLayout.setClickable(true);
                     keyboardCurrencyRelativeLayout.bringToFront();
                     keyboardAlphaNumericRelativeLayout.setClickable(false);
+                } else {
+                    priceEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_not_17));
                 }
             }
         });
@@ -247,15 +309,82 @@ public class TypeVinActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable et) {
                 String s = et.toString();
-                if (vinEditText.getText().length() == 17 && priceEditText.getText().length() > 0) {
+
+                if (vinEditText.getText().length() == 17 && priceEditText.getText().length() > 0 && dateBoughtEditText.getText().length() > 0) {
                     addVehicleButtonContainer.setVisibility(View.VISIBLE);
                 } else {
                     addVehicleButtonContainer.setVisibility(View.GONE);
                 }
             }
         });
+
+        dateBoughtTextInputLayout = (TextInputLayout) findViewById(R.id.type_date_bought_text_input_layout);
+        dateBoughtEditText = (EditText) typeVinCoordinateLayout.findViewById(R.id.type_date_bought_edit_text);
+        dateBoughtEditText.setTextColor(getResources().getColor(R.color.colorIconNotActivated));
+        dateBoughtEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_not_17));
+        dateBoughtEditText.setCursorVisible(false);
+        dateBoughtEditText.setShowSoftInputOnFocus(false);
+        dateBoughtEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    keyboardAlphaNumericRelativeLayout.setVisibility(View.GONE);
+                    keyboardCurrencyRelativeLayout.setVisibility(View.GONE);
+
+                    dateBoughtEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_17_focus));
+
+                    if (dateBoughtEditText.getText().toString().equals("")) {
+                        date = new Date();
+                    }
+
+                    createCalendarAlertDialog().show(getFragmentManager(), "SUBLIME_PICKER");
+                } else {
+                    dateBoughtEditText.setBackground(getResources().getDrawable(R.drawable.type_vin_underline_not_17));
+                }
+            }
+        });
+        dateBoughtEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createCalendarAlertDialog().show(getFragmentManager(), "SUBLIME_PICKER");
+            }
+        });
+        dateBoughtEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (vinEditText.getText().length() == 17 && priceEditText.getText().length() > 0 && dateBoughtEditText.getText().length() > 0) {
+                    addVehicleButtonContainer.setVisibility(View.VISIBLE);
+                } else {
+                    addVehicleButtonContainer.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        clearDateBoughtTextView = (TextView) findViewById(R.id.type_clear_date_bought_text_view);
+        clearDateBoughtTextView.bringToFront();
+        clearDateBoughtTextView.setVisibility(View.GONE);
+        clearDateBoughtTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dateBoughtEditText.setText("");
+                clearDateBoughtTextView.setVisibility(View.GONE);
+            }
+        });
     }
 
+    /**
+     *
+     */
     private void setupKeyboardAlphaNumericKeyListeners() {
         final RelativeLayout key_1 = (RelativeLayout) findViewById(R.id.key_1);
         key_1.setOnClickListener(new View.OnClickListener() {
@@ -754,6 +883,51 @@ public class TypeVinActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * create the Sublime Picker Fragment for choosing dates
+     * @return - SublimePickerFragment when shown will display a AlertDialog filled with a calendar
+     */
+    public SublimePickerFragment createCalendarAlertDialog() {
+        final SublimePickerFragment sublimePickerFragment = new SublimePickerFragment();
+        SublimeOptions sublimeOptions = new SublimeOptions();
+        sublimeOptions.setDisplayOptions(SublimeOptions.ACTIVATE_DATE_PICKER);
+        sublimeOptions.setPickerToShow(SublimeOptions.Picker.DATE_PICKER);
+        sublimeOptions.setDateParams(Calendar.getInstance());
+        sublimeOptions.setCanPickDateRange(false);
+        sublimeOptions.setAnimateLayoutChanges(true);
+//        sublimeOptions.setDateRange(filterStartDate.getTime(), filterEndDate.getTime()); //TODO: useful in future
+
+        Calendar startCalendar = Calendar.getInstance();
+        startCalendar.setTime(date);
+        SelectedDate selectedDate = new SelectedDate(startCalendar);
+        sublimeOptions.setDateParams(selectedDate);
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("SUBLIME_OPTIONS", sublimeOptions);
+        sublimePickerFragment.setArguments(bundle);
+        sublimePickerFragment.setStyle(R.style.SPStyle, 0);
+        final SublimePickerFragment.Callback mFragmentCallback = new SublimePickerFragment.Callback() {
+            @Override
+            public void onCancelled() {/* do nothing */}
+            @Override
+            public void onDateTimeRecurrenceSet(SelectedDate selectedDate, int hourOfDay, int minute, SublimeRecurrencePicker.RecurrenceOption recurrenceOption, String recurrenceRule) {
+                sublimePickerFragment.dismiss();
+                date = selectedDate.getFirstDate().getTime();
+                dateBoughtEditText.setText(dateFormat.format(date));
+                clearDateBoughtTextView.setVisibility(View.VISIBLE);
+            }
+        };
+
+        sublimePickerFragment.setCallback(mFragmentCallback);
+        return sublimePickerFragment;
+    }
+
+    /**
+     * ASyncTask for handling Vin number verification
+     * Vin number invalid will notify user with an error
+     * Vin number valid and exists will notify user that the vehicle already exists
+     * Vin number valid and does not exist will take user to TypeVinActivity and fill in edit text
+     */
     private class VinCheckTask extends AsyncTask<String, Void, Vehicle> {
 
         @Override
@@ -773,7 +947,7 @@ public class TypeVinActivity extends AppCompatActivity {
             String price_paid = df.format(Double.parseDouble(params[1]));
 
             try {
-                Vehicle vehicle = new VehicleDataJson("https://api.vinaudit.com/query.php?vin=" + vin + "&key=" + getResources().getString(R.string.vin_audit_api) + "&format=json", price_paid).decodeVinNumber();
+                Vehicle vehicle = new VehicleDataJson("https://api.vinaudit.com/query.php?vin=" + vin + "&key=" + getResources().getString(R.string.vin_audit_api) + "&format=json", price_paid, date).decodeVinNumber();
                 return vehicle;
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
@@ -785,7 +959,6 @@ public class TypeVinActivity extends AppCompatActivity {
         protected void onPostExecute(final Vehicle result) {
             super.onPostExecute(result);
             if (result != null) {
-                System.out.println(result.getPricePaid());
                 realm.executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -793,7 +966,7 @@ public class TypeVinActivity extends AppCompatActivity {
                     }
                 });
 
-                toast(result.getYear() + " " + result.getMake() + " " + result.getModel() + " added", true);
+                validationToast(result.getYear() + " " + result.getMake() + " " + result.getModel() + " added", true);
 
                 Intent mainActivityIntent = new Intent(TypeVinActivity.this, MainActivity.class);
                 mainActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -810,15 +983,28 @@ public class TypeVinActivity extends AppCompatActivity {
         }
     }
 
-    private void toast(String string, boolean success) {
+    /**
+     * shortcut for toasting message to user
+     * @param toast_string - String to toast
+     * @param success - valid or not, decides whether to print and X or Check in the toast
+     */
+    private void validationToast(String toast_string, boolean success) {
         Toast toast;
         if (success) {
-            toast = Toast.makeText(this, Html.fromHtml("<b>" + string + " <font color=\"green\"><big>&#x2713;</big></font></b>"), Toast.LENGTH_LONG);
+            toast = Toast.makeText(this, Html.fromHtml("<b>" + toast_string + " <font color=\"green\"><big>&#x2713;</big></font></b>"), Toast.LENGTH_LONG);
         } else {
-            toast = Toast.makeText(this, Html.fromHtml("<b>" + string + " <font color=\"red\"><big>&#x2717;</big></red></b>"), Toast.LENGTH_LONG);
+            toast = Toast.makeText(this, Html.fromHtml("<b>" + toast_string + " <font color=\"red\"><big>&#x2717;</big></red></b>"), Toast.LENGTH_LONG);
             toast.setGravity(Gravity.CENTER, 0, 100);
         }
         toast.show();
+    }
+
+    /**
+     * shortcut for toasting message to user
+     * @param toast_string - String to toast
+     */
+    private void toast(String toast_string) {
+        Toast.makeText(this, toast_string, Toast.LENGTH_LONG).show();
     }
 
 }
