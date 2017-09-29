@@ -1,8 +1,5 @@
-package com.choch.michaeldicioccio.myapplication;
+package com.choch.michaeldicioccio.myapplication.Sort;
 
-/**
- * Created by michaeldicioccio on 9/26/17.
- */
 
 public enum Sort {
 

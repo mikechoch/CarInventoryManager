@@ -10,9 +10,6 @@ import android.widget.RelativeLayout;
 
 import com.github.clans.fab.FloatingActionMenu;
 
-/**
- * Created by michaeldicioccio on 8/26/17.
- */
 
 public class FloatingActionMenuBehavior extends CoordinatorLayout.Behavior<FloatingActionMenu> {
 

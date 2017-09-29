@@ -1,9 +1,5 @@
 package com.choch.michaeldicioccio.myapplication.Json;
 
-/**
- * Created by michaeldicioccio on 9/12/17.
- */
-
 public enum JsonAttributes {
 
     ATTRIBUTES("attributes"),

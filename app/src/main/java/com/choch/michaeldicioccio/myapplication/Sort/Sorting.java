@@ -1,4 +1,4 @@
-package com.choch.michaeldicioccio.myapplication;
+package com.choch.michaeldicioccio.myapplication.Sort;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,9 +9,6 @@ import com.choch.michaeldicioccio.myapplication.Activities.MainActivity;
 import io.realm.Realm;
 import io.realm.RealmObject;
 
-/**
- * Created by michaeldicioccio on 9/26/17.
- */
 
 public class Sorting extends RealmObject {
 

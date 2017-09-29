@@ -1,8 +1,6 @@
 package com.choch.michaeldicioccio.myapplication.Activities;
 
 import android.Manifest;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
@@ -11,7 +9,6 @@ import android.os.Vibrator;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,8 +23,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.choch.michaeldicioccio.myapplication.Sort;
-import com.choch.michaeldicioccio.myapplication.Sorting;
+import com.choch.michaeldicioccio.myapplication.Sort.Sort;
+import com.choch.michaeldicioccio.myapplication.Sort.Sorting;
 import com.choch.michaeldicioccio.myapplication.VehicleContainerFragments.AllVehiclesFragment;
 import com.choch.michaeldicioccio.myapplication.VehicleContainerFragments.VehiclesFragment;
 import com.choch.michaeldicioccio.myapplication.VehicleContainerFragments.VehiclesSoldFragment;
@@ -411,7 +408,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * ASyncTask for loading frgaments
+     * ASyncTask for loading fragments
      * Hides UI elements, shows progress spinner and then displays fragment UI
      */
     private class FragmentLoaderTask extends AsyncTask<Integer, Void, Void> {

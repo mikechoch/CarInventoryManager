@@ -147,6 +147,15 @@ public class ScanVinActivity extends AppCompatActivity implements ZBarScannerVie
     }
 
     /**
+     * task to handle turning on the camera with control
+     */
+    private Runnable task = new Runnable() {
+        public void run() {
+            zBarScannerView.startCamera();
+        }
+    };
+
+    /**
      * start the TypeVinActivity with the VIN scanned value as a string extra
      */
     private void startTypeVinActivityFromScanVinActivity(String vin) {
@@ -167,12 +176,11 @@ public class ScanVinActivity extends AppCompatActivity implements ZBarScannerVie
     }
 
     /**
-     * task to handle turning on the camera with control
+     * shortcut for toasting message to user
+     * @param toast_string - String to toast
      */
-    private Runnable task = new Runnable() {
-        public void run() {
-            zBarScannerView.startCamera();
-        }
-    };
+    private void toast(String toast_string) {
+        Toast.makeText(this, toast_string, Toast.LENGTH_LONG).show();
+    }
 
 }

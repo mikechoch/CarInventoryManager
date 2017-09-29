@@ -238,7 +238,7 @@ public class ExpenseDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * leave edit mode and change UI elements to show edit mode is off
      */
     public void deactivateEditMode() {
         editModeEnabled = false;
@@ -255,10 +255,15 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    /**
+     * enter edit mode and change UI elements to show edit mode is on
+     */
     private void activateEditMode() {
         editModeEnabled = true;
 
-        expensePriceEditText.setText(String.valueOf(expense.getPrice()));
+        if (!newExpense) {
+            expensePriceEditText.setText(String.valueOf(expense.getPrice()));
+        }
 
         toggleEditTextEditable();
         toolbar.getMenu().clear();
@@ -267,6 +272,9 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    /**
+     * edit text toggle for leaving and entering edit mode
+     */
     private void toggleEditTextEditable() {
         if (editModeEnabled) {
             expenseTitleEditText.setEnabled(true);
@@ -284,6 +292,10 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * before storing edit text info to Realm, grab all of the edit text Strings
+     * @return - return edit texts as a String Array
+     */
     private String[] getEditTextStrings() {
         String[] strings = {
                 expenseTitleEditText.getText().toString(),
@@ -293,6 +305,11 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         return strings;
     }
 
+    /**
+     * validate all edit text Strings
+     * if any Strings are invalid input, throw error in TextInputLayout
+     * @return - boolean representing valid or invalid Strings in edit texts
+     */
     private boolean validEditTexts() {
         boolean passed = true;
 
@@ -322,6 +339,12 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         return passed;
     }
 
+    /**
+     * validate whether a String is a numeric
+     * used for validating the string inside of the
+     * @param str - String to check
+     * @return - boolean representing if String is numeric
+     */
     private boolean isNumeric(String str) {
         try {
             double d = Double.parseDouble(str);
@@ -331,6 +354,11 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * sets the result to finish as RESULT.OK if expense was modified
+     * sets the result to finish as RESULT.CANCEL if expense was not modified
+     * @param resultForFinish - boolean representing if expense was modified
+     */
     private void setResultForFinish(boolean resultForFinish) {
         Intent returnIntent = new Intent();
         if (resultForFinish) {
@@ -341,6 +369,10 @@ public class ExpenseDetailActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * ASyncTask for handling saving expense data to Realm
+     * Hides UI elements, shows progress spinner, and then returns to VehicleDetailActivity
+     */
     private class EditExpenseTask extends AsyncTask<String, Void, Void> {
 
         @Override
@@ -422,6 +454,14 @@ public class ExpenseDetailActivity extends AppCompatActivity {
 //        TextView messageTextView = (TextView) group.getChildAt(0);
 //        messageTextView.(16);
         toast.show();
+    }
+
+    /**
+     * shortcut for toasting message to user
+     * @param toast_string - String to toast
+     */
+    private void toast(String toast_string) {
+        Toast.makeText(this, toast_string, Toast.LENGTH_LONG).show();
     }
 
 }

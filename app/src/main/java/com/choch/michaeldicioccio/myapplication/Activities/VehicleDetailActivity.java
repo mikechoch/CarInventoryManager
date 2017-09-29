@@ -150,6 +150,76 @@ public class VehicleDetailActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(toolbarTitle);
         }
 
+        setupEditTexts();
+        setupAllButtons();
+        setupAllRecyclerViews();
+
+        dummyLinearLayout = (LinearLayout) findViewById(R.id.dummy_layout);
+        dummyLinearLayout.requestFocus();
+    }
+
+    /**
+     * handles bottom nav bar click
+     * edit mode is on will turn it off
+     * edit mode is off will return to last shown main fragment
+     */
+    @Override
+    public void onBackPressed() {
+        if (editModeEnabled) {
+            deactivateEditMode();
+        } else {
+            returnToMainFragment();
+            super.onBackPressed();
+        }
+    }
+
+    /**
+     * handles the on activity result
+     *
+     * @param requestCode - code given for specific activity to handle specific result
+     * @param resultCode - RESULT.OK or RESULT.CANCEL handling
+     * @param data - the intent to grab any data passed from an activity to this one
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == Activity.RESULT_OK){
+                vehicle = realm.copyFromRealm(realm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst());
+
+                expensesArrayList.clear();
+                for (int i = 0; i < vehicle.getExpenseCount(); i++) {
+                    expensesArrayList.add(vehicle.getExpenseAt(i));
+                }
+
+                customSwipeExpensesRecyclerViewAdapter.notifyDataSetChanged();
+                customNoSwipeExpensesRecyclerViewAdapter.notifyDataSetChanged();
+
+                if (customSwipeExpensesRecyclerViewAdapter.getItemCount() > 0) {
+                    noExpensesTextView.setVisibility(View.GONE);
+                    if (editModeEnabled) {
+                        swipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                        noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+                    } else {
+                        swipeExpensesRecyclerView.setVisibility(View.GONE);
+                        noSwipeExpensesRecyclerView.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    noExpensesTextView.setVisibility(View.VISIBLE);
+                    swipeExpensesRecyclerView.setVisibility(View.GONE);
+                    noSwipeExpensesRecyclerView.setVisibility(View.GONE);
+                }
+            }
+
+            if (resultCode == Activity.RESULT_CANCELED) {
+
+            }
+        }
+    }
+
+    /**
+     * setup all edit texts, listeners for edit texts, etc
+     */
+    private void setupEditTexts() {
         vehicleBuyerInfoCardView = (CardView) findViewById(R.id.vehicle_buyer_info_card_view);
 
         dateSoldTextInputLayout = (TextInputLayout) findViewById(R.id.date_sold_text_input_layout);
@@ -325,7 +395,12 @@ public class VehicleDetailActivity extends AppCompatActivity {
         } else {
             priceSoldEditText.setText("");
         }
+    }
 
+    /**
+     * setup all buttons, listeners for buttons, etc
+     */
+    private void setupAllButtons() {
         addExpenseButtonCardView = (CardView) findViewById(R.id.add_expense_button_container);
         addExpenseButtonCardView.setVisibility(View.VISIBLE);
         addExpenseButtonRelativeLayout = (RelativeLayout) findViewById(R.id.add_expense_button);
@@ -404,15 +479,21 @@ public class VehicleDetailActivity extends AppCompatActivity {
                 new EditInfoTask().execute(getEditTextStrings());
             }
         });
+    }
 
+    /**
+     * setup all recycler views
+     * one is for add expenses and viewing them
+     * other one is for swipe deleting and deleting all expenses at once
+     */
+    private void setupAllRecyclerViews() {
         swipeExpensesRecyclerView = (RecyclerView) findViewById(R.id.swipe_expenses_recycler_view);
         customSwipeExpensesRecyclerViewAdapter = new CustomExpensesRecyclerViewAdapter(
-                this,
                 expensesArrayList,
                 new RecyclerViewClickListener() {
                     @Override
                     public void onClick(View view, int position) {
-//                        startExpenseDetailActivity(position);
+
                     }
 
                     @Override
@@ -488,13 +569,12 @@ public class VehicleDetailActivity extends AppCompatActivity {
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
-        itemTouchHelper.attachToRecyclerView(swipeExpensesRecyclerView); //set swipe to recylcerview
+        itemTouchHelper.attachToRecyclerView(swipeExpensesRecyclerView);
 
         swipeExpensesRecyclerView.setAdapter(customSwipeExpensesRecyclerViewAdapter);
 
         noSwipeExpensesRecyclerView = (RecyclerView) findViewById(R.id.no_swipe_expenses_recycler_view);
         customNoSwipeExpensesRecyclerViewAdapter = new CustomExpensesRecyclerViewAdapter(
-                this,
                 expensesArrayList,
                 new RecyclerViewClickListener() {
                     @Override
@@ -530,72 +610,14 @@ public class VehicleDetailActivity extends AppCompatActivity {
             swipeExpensesRecyclerView.setVisibility(View.GONE);
             noSwipeExpensesRecyclerView.setVisibility(View.GONE);
         }
-
-        dummyLinearLayout = (LinearLayout) findViewById(R.id.dummy_layout);
-        dummyLinearLayout.requestFocus();
     }
 
     /**
-     *
-     */
-    @Override
-    public void onBackPressed() {
-        if (editModeEnabled) {
-            deactivateEditMode();
-        } else {
-            returnToMainFragment();
-            super.onBackPressed();
-        }
-    }
-
-    /**
-     *
-     * @param requestCode
-     * @param resultCode
-     * @param data
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK){
-                vehicle = realm.copyFromRealm(realm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst());
-
-                expensesArrayList.clear();
-                for (int i = 0; i < vehicle.getExpenseCount(); i++) {
-                    expensesArrayList.add(vehicle.getExpenseAt(i));
-                }
-
-                customSwipeExpensesRecyclerViewAdapter.notifyDataSetChanged();
-                customNoSwipeExpensesRecyclerViewAdapter.notifyDataSetChanged();
-
-                if (customSwipeExpensesRecyclerViewAdapter.getItemCount() > 0) {
-                    noExpensesTextView.setVisibility(View.GONE);
-                    if (editModeEnabled) {
-                        swipeExpensesRecyclerView.setVisibility(View.VISIBLE);
-                        noSwipeExpensesRecyclerView.setVisibility(View.GONE);
-                    } else {
-                        swipeExpensesRecyclerView.setVisibility(View.GONE);
-                        noSwipeExpensesRecyclerView.setVisibility(View.VISIBLE);
-                    }
-                } else {
-                    noExpensesTextView.setVisibility(View.VISIBLE);
-                    swipeExpensesRecyclerView.setVisibility(View.GONE);
-                    noSwipeExpensesRecyclerView.setVisibility(View.GONE);
-                }
-            }
-
-            if (resultCode == Activity.RESULT_CANCELED) {
-
-            }
-        }
-    }
-
-    /**
-     *
-     * @param editText
-     * @param clearButton
-     * @param date
-     * @return
+     * create the Sublime Picker Fragment for choosing dates
+     * @param editText - specific edit text to add date to
+     * @param clearButton - clear button to handle
+     * @param date - date to start SublimePickerFragment on when opening
+     * @return - SublimePickerFragment when shown will display a AlertDialog filled with a calendar
      */
     public SublimePickerFragment createCalendarAlertDialog(final EditText editText, final TextView clearButton, Date date) {
         final SublimePickerFragment sublimePickerFragment = new SublimePickerFragment();
@@ -635,9 +657,9 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
-     * @param name
-     * @return
+     * removes all extra space from a name, before, middle, and after
+     * @param name - String name to remove space from
+     * @return - String name with spaces removed
      */
     public String removeExtraSpacesName(String name) {
         if (name.length() > 0) {
@@ -662,9 +684,9 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
-     * @param phone_number
-     * @return
+     * fancies up a phone number with parenthesis for area code and dash for three to four digit
+     * @param phone_number - String phone number to fancy
+     * @return - fancy String phone number
      */
     public String fancyPhoneNumber(String phone_number) {
         StringBuilder phone_number_sb = new StringBuilder();
@@ -689,9 +711,9 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
-     * @param email
-     * @return
+     * removes all spaces from an email
+     * @param email - String email to remove spaces from
+     * @return - String email with spaces removed
      */
     public String removeExtraSpacesEmail(String email) {
         StringBuilder email_sb = new StringBuilder();
@@ -707,7 +729,7 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * leave edit mode and change UI elements to show edit mode is off
      */
     public void deactivateEditMode() {
         editModeEnabled = false;
@@ -759,7 +781,7 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * enter edit mode and change UI elements to show edit mode is on
      */
     private void activateEditMode() {
         editModeEnabled = true;
@@ -787,7 +809,7 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * edit text toggle for leaving and entering edit mode
      */
     private void toggleEditTextEditable() {
         if (editModeEnabled) {
@@ -875,8 +897,8 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
-     * @return
+     * before storing edit text info to Realm, grab all of the edit text Strings
+     * @return - return edit texts as a String Array
      */
     private String[] getEditTextStrings() {
         String[] strings = {
@@ -900,7 +922,7 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * starts the ExpenseDetailActivity based and the data shown is based on the expense clicked
      * @param position
      */
     private void startExpenseDetailActivity(int position) {
@@ -911,7 +933,7 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * returns to main fragment last shown with RESULT.OK
      */
     private void returnToMainFragment() {
         Intent returnIntent = new Intent();
@@ -920,7 +942,7 @@ public class VehicleDetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * ASyncTask for handling saving all VehicleDetail information into Realm
      */
     private class EditInfoTask extends AsyncTask<String, Void, String> {
 
@@ -1016,8 +1038,6 @@ public class VehicleDetailActivity extends AppCompatActivity {
             vehicle = realm.copyFromRealm(realm.where(Vehicle.class).equalTo("vin", getIntent().getStringExtra("vin")).findFirst());
             deactivateEditMode();
 
-
-
             validationToast(toolbarTitle + " updated");
         }
     }
@@ -1032,6 +1052,14 @@ public class VehicleDetailActivity extends AppCompatActivity {
 //        TextView messageTextView = (TextView) group.getChildAt(0);
 //        messageTextView.(16);
         toast.show();
+    }
+
+    /**
+     * shortcut for toasting message to user
+     * @param toast_string - String to toast
+     */
+    private void toast(String toast_string) {
+        Toast.makeText(this, toast_string, Toast.LENGTH_LONG).show();
     }
 
 }

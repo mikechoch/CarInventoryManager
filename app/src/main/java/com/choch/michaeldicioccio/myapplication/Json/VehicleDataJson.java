@@ -14,26 +14,38 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Date;
 
-/**
- * Created by michaeldicioccio on 9/9/17.
- */
 
 public class VehicleDataJson {
 
+    /* Attributes */
     private String json_url;
     private String price_paid;
     private Date date_bought;
 
+    /* Constructor */
     public VehicleDataJson(String json_url, String price_paid, Date date_bought) {
         this.json_url = json_url;
         this.price_paid = price_paid;
         this.date_bought = date_bought;
     }
 
+    /**
+     * start vin JSON data pull
+     * @return - Vehicle object with all JSON data
+     * @throws IOException
+     * @throws JSONException
+     */
     public Vehicle decodeVinNumber() throws IOException, JSONException {
         return parseJson(getJsonFromUrl(json_url));
     }
 
+    /**
+     * reads the JSON object using the vin number provided and the url created
+     * @param json_url - url to pull JSON object
+     * @return - JSONObject representing the Vehicle object to be created
+     * @throws IOException
+     * @throws JSONException
+     */
     private JSONObject getJsonFromUrl(String json_url) throws IOException, JSONException {
         InputStream is = new URL(json_url).openStream();
         BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
@@ -43,6 +55,12 @@ public class VehicleDataJson {
         return new JSONObject(sb.toString());
     }
 
+    /**
+     * parses through the JSONObject and creates a Vehicle object with all of the data
+     * @param jsonObject - JSONObject to parse for Vehicle data
+     * @return - Vehicle object populated with all JSON data
+     * @throws JSONException
+     */
     private Vehicle parseJson(JSONObject jsonObject) throws JSONException {
         Vehicle vehicle = new Vehicle();
 

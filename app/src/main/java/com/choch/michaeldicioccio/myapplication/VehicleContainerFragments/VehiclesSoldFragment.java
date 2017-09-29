@@ -27,13 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.choch.michaeldicioccio.myapplication.Activities.VehicleDetailActivity;
-import com.choch.michaeldicioccio.myapplication.Sorting;
+import com.choch.michaeldicioccio.myapplication.Sort.Sorting;
 import com.choch.michaeldicioccio.myapplication.Vehicle.CustomVehiclesRecyclerViewAdapter;
 import com.choch.michaeldicioccio.myapplication.Activities.MainActivity;
 import com.choch.michaeldicioccio.myapplication.R;
 import com.choch.michaeldicioccio.myapplication.RecyclerViewClickListener;
 import com.choch.michaeldicioccio.myapplication.Vehicle.Vehicle;
-import com.choch.michaeldicioccio.myapplication.Vehicle.VehicleBuyer;
 
 import java.util.ArrayList;
 
@@ -351,7 +350,7 @@ public class VehiclesSoldFragment extends Fragment {
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
-        itemTouchHelper.attachToRecyclerView(vehiclesSoldRecyclerView); //set swipe to recylcerview
+        itemTouchHelper.attachToRecyclerView(vehiclesSoldRecyclerView);
 
         vehiclesSoldRecyclerView.setAdapter(customVehiclesSoldRecyclerViewAdapter);
         sortRecyclerView();

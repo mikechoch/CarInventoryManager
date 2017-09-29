@@ -7,14 +7,17 @@ import me.dm7.barcodescanner.zbar.BarcodeFormat;
 
 public class VinErrorCheck {
 
+    /* Attributes */
     private String vin;
     private String errorMessage;
 
+    /* Constructor */
     public VinErrorCheck(String vin) {
         System.out.println(vin);
         this.vin = vin;
     }
 
+    /* Vin Verification */
     public boolean verifyValidVin(String barcodeFormat) {
         System.out.println(barcodeFormat);
         if (verifyBarcodeFormat(barcodeFormat) && verifyVinLength(vin)) {
@@ -24,6 +27,11 @@ public class VinErrorCheck {
         return false;
     }
 
+    /**
+     * verifies the barcode format scanned with valid vin number barcode formats CODE: 39, 128, 93
+     * @param barcodeFormat - String representing the barcode format scanned
+     * @return - boolean representing a valid barcode
+     */
     public boolean verifyBarcodeFormat(String barcodeFormat) {
         if (barcodeFormat.toLowerCase().equals(BarcodeFormat.CODE39.getName().toLowerCase())
                 || barcodeFormat.toLowerCase().equals(BarcodeFormat.CODE128.getName().toLowerCase())
@@ -35,6 +43,11 @@ public class VinErrorCheck {
         return false;
     }
 
+
+    /**
+     * Checks on the 18 length vin and removes the first char since some have an "I"
+     * Checks on the 17 length vin
+     */
     public boolean verifyVinLength(String vin) {
         int vin_n = vin.length();
         if (vin_n == 18 && vin.substring(0, 1).equals("I")) {
@@ -47,6 +60,7 @@ public class VinErrorCheck {
         return false;
     }
 
+    /* Getters */
     public String getErrorMessage() {
         return errorMessage;
     }

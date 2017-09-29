@@ -26,7 +26,7 @@ import java.util.List;
 
 public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<CustomVehiclesRecyclerViewAdapter.MyViewHolder> {
 
-    /* Globals */
+    /* Attributes */
     private Context context;
     private ArrayList<Vehicle> vehicleArrayList;
     private RecyclerViewClickListener listener;
@@ -36,6 +36,10 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
     private DecimalFormat df = new DecimalFormat(Default.DOUBLE_FORMAT.getObject().toString());
     private DateFormat dateFormat = new SimpleDateFormat(Default.DATE_FORMAT.getObject().toString());
 
+    /**
+     * MyViewHolder class
+     * defines all UI elements to be modified for showing vehicle info
+     */
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public View view;
         public TextView itemTitleTextView;
@@ -61,6 +65,7 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         }
     }
 
+    /* Constructor */
     public CustomVehiclesRecyclerViewAdapter(Context context, ArrayList<Vehicle> vehicleArrayList, RecyclerViewClickListener listener) {
         this.context = context;
         this.vehicleArrayList = vehicleArrayList;
@@ -68,6 +73,10 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         selectedItems = new SparseBooleanArray();
     }
 
+    /**
+     * defines the layout for each item
+     * @return - the MyViewHolder for each item
+     */
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
@@ -76,6 +85,9 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         return new MyViewHolder(itemView);
     }
 
+    /**
+     * handles what is going to be shown in each MyViewHolder container
+     */
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final Vehicle vehicle = vehicleArrayList.get(position);
@@ -167,6 +179,11 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         applyClickEvents(holder, position);
     }
 
+    /**
+     * handles click events on Vehicles
+     * @param holder - MyViewHolder representing container of the item view clicked
+     * @param position - position of the item clicked
+     */
     private void applyClickEvents(final MyViewHolder holder, final int position) {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,11 +205,17 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         });
     }
 
+    /**
+     * get data set item count
+     */
     @Override
     public int getItemCount() {
         return vehicleArrayList.size();
     }
 
+    /**
+     * toggle selection at position
+     */
     public void toggleSelection(int position) {
         if (selectedItems.get(position, false)) {
             selectedItems.delete(position);
@@ -202,15 +225,25 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         notifyItemChanged(position);
     }
 
+    /**
+     * clear selected items
+     */
     public void clearSelections() {
         selectedItems.clear();
         notifyDataSetChanged();
     }
 
+    /**
+     * get count of selected items
+     */
     public int getSelectedItemCount() {
         return selectedItems.size();
     }
 
+    /**
+     * get selected items in action mode
+     * @return - List<Integer> selected item positions
+     */
     public List<Integer> getSelectedItems() {
         List<Integer> items = new ArrayList<>(getSelectedItemCount());
         for (int i = getSelectedItemCount() - 1; i > -1; i--) {
@@ -219,14 +252,25 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         return items;
     }
 
+    /**
+     * set Action Mode enabled
+     * @param actionMode - boolean action mode enabled
+     */
     public void setActionMode(boolean actionMode) {
         this.actionModeEnabled = actionMode;
     }
 
+    /**
+     * check if Action Mode is enabled
+     * @return - boolean action mode enabled
+     */
     public boolean isActionModeEnabled() {
         return this.actionModeEnabled;
     }
 
+    /**
+     * add Vehicle at position in data set
+     */
     public void addAt(int position, Vehicle vehicle) {
         vehicleArrayList.add(position, vehicle);
         notifyItemInserted(position);
@@ -240,6 +284,9 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         }
     }
 
+    /**
+     * remove Vehicle from position in data set
+     */
     public void removeAt(int position) {
         vehicleArrayList.remove(position);
         notifyItemRemoved(position);
@@ -257,14 +304,25 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         }
     }
 
+    /**
+     * get a Vehicle from the data set
+     * @param position - position to get Vehicle from
+     * @return - Vehicle object
+     */
     public Vehicle getVehicleAt(int position) {
         return vehicleArrayList.get(position);
     }
 
+    /**
+     * set data set
+     */
     public void setDataSet(ArrayList<Vehicle> carArrayList) {
         this.vehicleArrayList = carArrayList;
     }
 
+    /**
+     * sort data set by Vehicle Make
+     */
     public void sortDataSetByMake() {
         System.out.println(vehicleArrayList);
         Collections.sort(vehicleArrayList, new Comparator<Vehicle>() {
@@ -276,6 +334,9 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         notifyItemRangeChanged(0, getItemCount());
     }
 
+    /**
+     * sort data set by Vehicle Date
+     */
     public void sortDataSetByDate() {
         ArrayList<Vehicle> noDateSetVehicles = new ArrayList<>();
         for (int i = vehicleArrayList.size()-1; i > -1; i--) {
@@ -306,6 +367,9 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         notifyItemRangeChanged(0, getItemCount());
     }
 
+    /**
+     * sort data set by Vehicle Model
+     */
     public void sortDataSetByModel() {
         System.out.println(vehicleArrayList);
         Collections.sort(vehicleArrayList, new Comparator<Vehicle>() {

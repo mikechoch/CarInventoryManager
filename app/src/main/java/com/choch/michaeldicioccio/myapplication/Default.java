@@ -1,8 +1,5 @@
 package com.choch.michaeldicioccio.myapplication;
 
-/**
- * Created by michaeldicioccio on 9/13/17.
- */
 
 public enum Default {
 

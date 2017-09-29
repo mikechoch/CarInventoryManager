@@ -1,9 +1,5 @@
 package com.choch.michaeldicioccio.myapplication;
 
-/**
- * Created by michaeldicioccio on 3/10/17.
- */
-
 import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,6 +16,7 @@ import com.appeaser.sublimepickerlibrary.recurrencepicker.SublimeRecurrencePicke
 import java.text.DateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
+
 
 public class SublimePickerFragment extends DialogFragment {
     // Date & Time formatter used for formatting

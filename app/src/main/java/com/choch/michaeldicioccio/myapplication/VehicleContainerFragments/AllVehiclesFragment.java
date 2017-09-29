@@ -24,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.choch.michaeldicioccio.myapplication.Activities.VehicleDetailActivity;
-import com.choch.michaeldicioccio.myapplication.Sorting;
+import com.choch.michaeldicioccio.myapplication.Sort.Sorting;
 import com.choch.michaeldicioccio.myapplication.Vehicle.CustomVehiclesRecyclerViewAdapter;
 import com.choch.michaeldicioccio.myapplication.Activities.MainActivity;
 import com.choch.michaeldicioccio.myapplication.R;
