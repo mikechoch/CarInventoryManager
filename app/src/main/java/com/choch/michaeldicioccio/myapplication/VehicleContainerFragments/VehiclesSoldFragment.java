@@ -41,7 +41,7 @@ import io.realm.Realm;
 
 public class VehiclesSoldFragment extends Fragment {
 
-    /* Attributes */
+    /* Globals */
     private Realm realm;
 
     private Sorting sorting;
@@ -51,7 +51,7 @@ public class VehiclesSoldFragment extends Fragment {
     private RelativeLayout noVehiclesSoldRelativeLayout;
 
     private TextView sortButtonTextView, vehicleCountTextView;
-    private RelativeLayout sortButtonRelativeLayout;
+    public static RelativeLayout sortButtonRelativeLayout;
 
     public static Toolbar toolbar;
     public static DrawerLayout drawer;
@@ -258,13 +258,13 @@ public class VehiclesSoldFragment extends Fragment {
                         if (!customVehiclesSoldRecyclerViewAdapter.isActionModeEnabled()) {
                             startVehicleDetailActivity(position);
                         } else {
-                            checkedSelectedCount(false);
+                            checkSelectedState(false);
                         }
                     }
 
                     @Override
                     public void onLongClick(View view, int position) {
-                        checkedSelectedCount(true);                    }
+                        checkSelectedState(true);                    }
                 });
 
         RecyclerView.LayoutManager mLayoutManager =
@@ -296,13 +296,14 @@ public class VehiclesSoldFragment extends Fragment {
                             vehicle[1] = realm.copyFromRealm(vehicle[0]);
                             vehicle[0].setSold(false);
                             vehicle[0].setSellDate(null);
+                            vehicle[0].setPriceSold(0.0);
                             vehicle[0].setSoldPriceBeenSetBefore(false);
                             vehicle[0].getVehicleBuyer().setName("");
                             vehicle[0].getVehicleBuyer().setPhoneNumber("");
                             vehicle[0].getVehicleBuyer().setEmail("");
 
                             customVehiclesSoldRecyclerViewAdapter.removeAt(position);
-                            checkedSelectedCount(false);
+                            checkSelectedState(false);
                         }
                     });
 
@@ -329,6 +330,13 @@ public class VehiclesSoldFragment extends Fragment {
                                                 vehicle[0].setSold(true);
                                                 vehicle[0].setSellDate(vehicle[1].getSellDate());
                                                 vehicle[0].setPriceSold(vehicle[1].getPriceSold());
+
+                                                if (vehicle[1].getPriceSold() > 0) {
+                                                    vehicle[0].setSoldPriceBeenSetBefore(true);
+                                                } else {
+                                                    vehicle[0].setSoldPriceBeenSetBefore(false);
+                                                }
+
                                                 vehicle[0].getVehicleBuyer().setName(vehicle[1].getVehicleBuyer().getName());
                                                 vehicle[0].getVehicleBuyer().setPhoneNumber(vehicle[1].getVehicleBuyer().getPhoneNumber());
                                                 vehicle[0].getVehicleBuyer().setEmail(vehicle[1].getVehicleBuyer().getEmail());
@@ -412,6 +420,9 @@ public class VehiclesSoldFragment extends Fragment {
     public static Toolbar deactivateActionMode() {
         customVehiclesSoldRecyclerViewAdapter.setActionMode(false);
         customVehiclesSoldRecyclerViewAdapter.clearSelections();
+
+        sortButtonRelativeLayout.setVisibility(View.VISIBLE);
+
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(null);
         toolbar.setTitle("Sold Vehicles");
@@ -422,6 +433,9 @@ public class VehiclesSoldFragment extends Fragment {
 
     private void activateActionMode() {
         customVehiclesSoldRecyclerViewAdapter.setActionMode(true);
+
+        sortButtonRelativeLayout.setVisibility(View.GONE);
+
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(R.mipmap.ic_arrow_left_white_24dp);
         toolbar.setTitle("");
@@ -434,7 +448,7 @@ public class VehiclesSoldFragment extends Fragment {
         });
     }
 
-    private void checkedSelectedCount(boolean long_clicked) {
+    private void checkSelectedState(boolean long_clicked) {
         if (customVehiclesSoldRecyclerViewAdapter.isActionModeEnabled()) {
             if (customVehiclesSoldRecyclerViewAdapter.getSelectedItemCount() == 0) {
                 updateToolbarOnBackPressed(deactivateActionMode());

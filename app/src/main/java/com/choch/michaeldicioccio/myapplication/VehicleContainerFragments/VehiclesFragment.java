@@ -44,7 +44,7 @@ import io.realm.Realm;
 
 public class VehiclesFragment extends Fragment {
 
-    /* Attributes */
+    /* Globals */
     private Realm realm;
 
     private Sorting sorting;
@@ -57,7 +57,7 @@ public class VehiclesFragment extends Fragment {
     private FrameLayout frameLayout;
 
     private TextView sortButtonTextView, vehicleCountTextView;
-    private RelativeLayout sortButtonRelativeLayout;
+    public static RelativeLayout sortButtonRelativeLayout;
 
     public static Toolbar toolbar;
     public static DrawerLayout drawer;
@@ -258,13 +258,13 @@ public class VehiclesFragment extends Fragment {
                         if (!customVehiclesRecyclerViewAdapter.isActionModeEnabled()) {
                             startVehicleDetailActivity(position);
                         } else {
-                            checkedSelectedCount(false);
+                            checkSelectedState(false);
                         }
                     }
 
                     @Override
                     public void onLongClick(View view, int position) {
-                        checkedSelectedCount(true);
+                        checkSelectedState(true);
                     }
                 });
 
@@ -297,7 +297,7 @@ public class VehiclesFragment extends Fragment {
                             vehicle[0].setSold(true);
 
                             customVehiclesRecyclerViewAdapter.removeAt(position);
-                            checkedSelectedCount(false);
+                            checkSelectedState(false);
                         }
                     });
 
@@ -405,6 +405,9 @@ public class VehiclesFragment extends Fragment {
     public static Toolbar deactivateActionMode() {
         customVehiclesRecyclerViewAdapter.setActionMode(false);
         customVehiclesRecyclerViewAdapter.clearSelections();
+
+        sortButtonRelativeLayout.setVisibility(View.VISIBLE);
+
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(null);
         toolbar.setTitle("Vehicle Inventory");
@@ -415,6 +418,9 @@ public class VehiclesFragment extends Fragment {
 
     public void activateActionMode() {
         customVehiclesRecyclerViewAdapter.setActionMode(true);
+
+        sortButtonRelativeLayout.setVisibility(View.GONE);
+
         toolbar.getMenu().clear();
         toolbar.setTitle("");
         toolbar.inflateMenu(R.menu.vehicles_action_menu);
@@ -427,7 +433,7 @@ public class VehiclesFragment extends Fragment {
         });
     }
 
-    private void checkedSelectedCount(boolean long_clicked) {
+    private void checkSelectedState(boolean long_clicked) {
         if (customVehiclesRecyclerViewAdapter.isActionModeEnabled()) {
             if (customVehiclesRecyclerViewAdapter.getSelectedItemCount() == 0) {
                 updateToolbar(deactivateActionMode());

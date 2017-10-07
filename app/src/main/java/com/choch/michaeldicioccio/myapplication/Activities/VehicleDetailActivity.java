@@ -662,23 +662,25 @@ public class VehicleDetailActivity extends AppCompatActivity {
      * @return - String name with spaces removed
      */
     public String removeExtraSpacesName(String name) {
-        if (name.length() > 0) {
-            StringBuilder spaceless_sb = new StringBuilder();
-            boolean first_alpha = false;
-            for (char letter : name.toCharArray()) {
-                if (first_alpha && letter == ' ') {
-                    spaceless_sb.append(" ");
-                    first_alpha = false;
-                } else if (!(letter == ' ')) {
-                    first_alpha = true;
-                    spaceless_sb.append(letter);
+        StringBuilder spaceless_sb = new StringBuilder();
+        if (name != null) {
+            if (name.length() > 0) {
+                boolean first_alpha = false;
+                for (char letter : name.toCharArray()) {
+                    if (first_alpha && letter == ' ') {
+                        spaceless_sb.append(" ");
+                        first_alpha = false;
+                    } else if (!(letter == ' ')) {
+                        first_alpha = true;
+                        spaceless_sb.append(letter);
+                    }
                 }
-            }
 
-            if (spaceless_sb.charAt(spaceless_sb.length() - 1) == ' ') {
-                return spaceless_sb.substring(0, spaceless_sb.length() - 1);
+                if (spaceless_sb.charAt(spaceless_sb.length() - 1) == ' ') {
+                    return spaceless_sb.substring(0, spaceless_sb.length() - 1);
+                }
+                return spaceless_sb.toString();
             }
-            return spaceless_sb.toString();
         }
         return null;
     }
@@ -693,18 +695,20 @@ public class VehicleDetailActivity extends AppCompatActivity {
         String area_code;
         String three_digit;
         String four_digit;
-        switch (phone_number.length()) {
-            case 7:
-                three_digit = phone_number.substring(0, 3);
-                four_digit = phone_number.substring(3);
-                phone_number_sb.append(three_digit + "-" + four_digit);
-                return phone_number_sb.toString();
-            case 10:
-                area_code = phone_number.substring(0, 3);
-                three_digit = phone_number.substring(3, 6);
-                four_digit = phone_number.substring(6);
-                phone_number_sb.append("(" + area_code + ") " + three_digit + "-" + four_digit);
-                return phone_number_sb.toString();
+        if (phone_number != null) {
+            switch (phone_number.length()) {
+                case 7:
+                    three_digit = phone_number.substring(0, 3);
+                    four_digit = phone_number.substring(3);
+                    phone_number_sb.append(three_digit + "-" + four_digit);
+                    return phone_number_sb.toString();
+                case 10:
+                    area_code = phone_number.substring(0, 3);
+                    three_digit = phone_number.substring(3, 6);
+                    four_digit = phone_number.substring(6);
+                    phone_number_sb.append("(" + area_code + ") " + three_digit + "-" + four_digit);
+                    return phone_number_sb.toString();
+            }
         }
 
         return phone_number;
@@ -717,13 +721,15 @@ public class VehicleDetailActivity extends AppCompatActivity {
      */
     public String removeExtraSpacesEmail(String email) {
         StringBuilder email_sb = new StringBuilder();
-        if (email.length() > 0) {
-            for (char letter : email.toCharArray()) {
-                if (letter != ' ') {
-                    email_sb.append(letter);
+        if (email != null) {
+            if (email.length() > 0) {
+                for (char letter : email.toCharArray()) {
+                    if (letter != ' ') {
+                        email_sb.append(letter);
+                    }
                 }
+                return email_sb.toString();
             }
-            return email_sb.toString();
         }
         return null;
     }

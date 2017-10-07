@@ -38,7 +38,7 @@ import io.realm.Realm;
 
 public class AllVehiclesFragment extends Fragment {
 
-    /* Attributes */
+    /* Globals */
     private Realm realm;
 
     private Sorting sorting;
@@ -48,7 +48,7 @@ public class AllVehiclesFragment extends Fragment {
     private RelativeLayout noAllVehiclesRelativeLayout;
 
     private TextView sortButtonTextView, vehicleCountTextView;
-    private RelativeLayout sortButtonRelativeLayout;
+    public static RelativeLayout sortButtonRelativeLayout;
 
     public static Toolbar toolbar;
     public static DrawerLayout drawer;
@@ -190,13 +190,13 @@ public class AllVehiclesFragment extends Fragment {
                         if (!customAllVehiclesRecyclerViewAdapter.isActionModeEnabled()) {
                             startVehicleDetailActivity(position);
                         } else {
-                            checkedSelectedCount(false);
+                            checkSelectedState(false);
                         }
                     }
 
                     @Override
                     public void onLongClick(View view, int position) {
-                        checkedSelectedCount(true);
+                        checkSelectedState(true);
                     }
                 });
 
@@ -264,6 +264,9 @@ public class AllVehiclesFragment extends Fragment {
     public static Toolbar deactivateActionMode() {
         customAllVehiclesRecyclerViewAdapter.setActionMode(false);
         customAllVehiclesRecyclerViewAdapter.clearSelections();
+
+        sortButtonRelativeLayout.setVisibility(View.VISIBLE);
+
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(null);
         toolbar.setTitle("All Vehicles");
@@ -274,6 +277,9 @@ public class AllVehiclesFragment extends Fragment {
 
     private void activateActionMode() {
         customAllVehiclesRecyclerViewAdapter.setActionMode(true);
+
+        sortButtonRelativeLayout.setVisibility(View.GONE);
+
         toolbar.getMenu().clear();
         toolbar.setNavigationIcon(R.mipmap.ic_arrow_left_white_24dp);
         toolbar.setTitle("");
@@ -286,7 +292,7 @@ public class AllVehiclesFragment extends Fragment {
         });
     }
 
-    private void checkedSelectedCount(boolean long_clicked) {
+    private void checkSelectedState(boolean long_clicked) {
         if (customAllVehiclesRecyclerViewAdapter.isActionModeEnabled()) {
             if (customAllVehiclesRecyclerViewAdapter.getSelectedItemCount() == 0) {
                 updateToolbarOnBackPressed(deactivateActionMode());

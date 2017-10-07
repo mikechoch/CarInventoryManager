@@ -43,7 +43,7 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public View view;
         public TextView itemTitleTextView;
-        public TextView itemVinTetxView;
+        public TextView itemVinTextView;
         public TextView itemOwnedStatusTextView;
         public RelativeLayout itemOwnedStatusRelativeLayout;
         public TextView itemDateTextView;
@@ -55,7 +55,7 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
             super(view);
             this.view = view;
             itemTitleTextView = (TextView) view.findViewById(R.id.year_make_model_text_view);
-            itemVinTetxView = (TextView) view.findViewById(R.id.vin_edit_text);
+            itemVinTextView = (TextView) view.findViewById(R.id.vin_edit_text);
             itemOwnedStatusTextView = (TextView) view.findViewById(R.id.owned_status_title_view);
             itemOwnedStatusRelativeLayout = (RelativeLayout) view.findViewById(R.id.owned_status_relative_layout);
             itemDateTextView = (TextView) view.findViewById(R.id.date_text_view);
@@ -94,7 +94,7 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         holder.itemTitleTextView.setText(vehicle.getYear() + " "
                 + vehicle.getMake() + " "
                 + vehicle.getModel());
-        holder.itemVinTetxView.setText(vehicle.getVin());
+        holder.itemVinTextView.setText(vehicle.getVin());
         if (vehicle.isSold()) {
             holder.itemOwnedStatusTextView.setText("Sold");
             holder.itemOwnedStatusRelativeLayout.setBackgroundColor(context.getResources().getColor(R.color.colorIconNotActivated));
@@ -230,7 +230,7 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
      */
     public void clearSelections() {
         selectedItems.clear();
-        notifyDataSetChanged();
+        notifyItemRangeChanged(0, getItemCount());
     }
 
     /**
@@ -275,11 +275,13 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         vehicleArrayList.add(position, vehicle);
         notifyItemInserted(position);
 
-        for (int i = getSelectedItemCount() - 1; i > -1; i--) {
-            int key = selectedItems.keyAt(i);
+        List<Integer> tempSelectedItems = getSelectedItems();
+        clearSelections();
+        for (int key : tempSelectedItems) {
             if (key >= position) {
-                toggleSelection(key);
-                toggleSelection(key + 1);
+                selectedItems.append(key + 1, true);
+            } else if (key < position) {
+                selectedItems.append(key, true);
             }
         }
     }
@@ -291,15 +293,15 @@ public class CustomVehiclesRecyclerViewAdapter extends RecyclerView.Adapter<Cust
         vehicleArrayList.remove(position);
         notifyItemRemoved(position);
 
-        if (selectedItems.get(position, false)) {
-            toggleSelection(position);
-        }
+        selectedItems.delete(position);
 
-        for (int i = 0; i < getSelectedItemCount(); i++) {
-            int key = selectedItems.keyAt(i);
+        List<Integer> tempSelectedItems = getSelectedItems();
+        clearSelections();
+        for (int key : tempSelectedItems) {
             if (key > position) {
-                toggleSelection(key);
-                toggleSelection(key - 1);
+                selectedItems.append(key - 1, true);
+            } else if (key < position) {
+                selectedItems.append(key, true);
             }
         }
     }
