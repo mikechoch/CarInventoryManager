@@ -96,9 +96,13 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.main_activity_layout);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         Realm.init(this);
         realm = Realm.getDefaultInstance();
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        current_nav_item_selected = R.id.nav_inventory;
+        vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+        vehicleSortTypes = new String[Sort.values().length];
+
         if (realm.where(Sorting.class).findFirst() == null) {
             final Sorting sorting = new Sorting();
             vehicleSortType = sorting.getSortType();
@@ -113,24 +117,16 @@ public class MainActivity extends AppCompatActivity
         }
 
         int count = 0;
-        vehicleSortTypes = new String[Sort.values().length];
         for (Sort sort : Sort.values()) {
             vehicleSortTypes[count++] = sort.getSortType();
         }
-
         setupFloatingActionButtonMenu();
-
-        vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
-
         getFragmentManager().beginTransaction().replace(
                 R.id.main_activity_content,
                 new VehiclesFragment()).commit();
 
         updateToolbarOnBackPressed(toolbar);
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        current_nav_item_selected = R.id.nav_inventory;
         navigationView.setCheckedItem(current_nav_item_selected);
 
     }
@@ -146,8 +142,7 @@ public class MainActivity extends AppCompatActivity
         int checked_item = 0;
         Menu menu = navigationView.getMenu().getItem(1).getSubMenu();
         for (int i = 0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            if (item.isChecked()) {
+            if (menu.getItem(i).isChecked()) {
                 checked_item = i;
             }
         }
@@ -166,23 +161,31 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void toggleNavDrawer() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        }
+    }
+
+    private void toggleFloatingActionMenu() {
+        floatingActionMenu.close(floatingActionMenu.isOpened());
+    }
+
+    private void toggleToolbarViewUpdate() {
+        if (getSupportActionBar().getTitle().equals("")) {
+            updateCurrentToolBarView(current_nav_item_selected);
+        }
+    }
+
     /**
      * logic when the bottom nav bar back button is pressed
      */
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-
-        } else if (floatingActionMenu.isOpened()) {
-            floatingActionMenu.close(true);
-
-        } else if (getSupportActionBar().getTitle().equals("")) {
-            updateCurrentToolBarView(current_nav_item_selected);
-
-        } else {
-            super.onBackPressed();
-        }
+        toggleNavDrawer();
+        toggleFloatingActionMenu();
+        toggleToolbarViewUpdate();
+        super.onBackPressed();
     }
 
     /**
@@ -195,20 +198,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case 100:
-                for (int i = 0; i < permissions.length; i++) {
-                    String permission = permissions[i];
-                    int grantResult = grantResults[i];
-
-                    if (permission.equals(Manifest.permission.CAMERA)) {
-                        if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                            Intent scannerIntent = new Intent(this, ScanVinActivity.class);
-                            startActivity(scannerIntent);
-                        }
-                    }
+        if (requestCode == 100) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (permissions[i].equals(Manifest.permission.CAMERA) &&
+                        grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                    Intent scannerIntent = new Intent(this, ScanVinActivity.class);
+                    startActivity(scannerIntent);
                 }
-                break;
+            }
         }
     }
 
@@ -316,11 +313,7 @@ public class MainActivity extends AppCompatActivity
         floatingActionMenu.setOnMenuToggleListener(new FloatingActionMenu.OnMenuToggleListener() {
             @Override
             public void onMenuToggle(boolean opened) {
-                if (opened) {
-                    floatingActionMenu.setClickable(true);
-                } else {
-                    floatingActionMenu.setClickable(false);
-                }
+                floatingActionMenu.setClickable(opened);
             }
         });
 
@@ -331,9 +324,7 @@ public class MainActivity extends AppCompatActivity
         floatingActionMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (floatingActionMenu.isOpened()) {
-                    floatingActionMenu.close(true);
-                }
+                floatingActionMenu.close(floatingActionMenu.isOpened());
             }
         });
 
@@ -350,8 +341,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 updateCurrentToolBarView(current_nav_item_selected);
                 // mini fab click event handler
-                int id  = view.getId();
-                switch(id) {
+                switch(view.getId()) {
                     case R.id.type_vin_fab:
                         startTypeVinActivity();
                         break;

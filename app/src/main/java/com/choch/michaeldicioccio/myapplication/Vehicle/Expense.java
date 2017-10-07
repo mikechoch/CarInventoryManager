@@ -51,10 +51,7 @@ public class Expense extends RealmObject {
     /* Overrides */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Expense)) {
-            return false;
-        }
+        return obj instanceof Expense && title.equals(((Expense) obj).getTitle());
 
-        return title.equals(((Expense) obj).getTitle());
     }
 }

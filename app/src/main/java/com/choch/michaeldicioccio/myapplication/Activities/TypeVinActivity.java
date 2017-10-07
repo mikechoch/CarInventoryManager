@@ -106,16 +106,14 @@ public class TypeVinActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Add Vehicle");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        Realm.init(this);
+        layoutDisappearingTransition = new LayoutTransition();
+        layoutAppearingTransition = new LayoutTransition();
         realm = Realm.getDefaultInstance();
 
+        Realm.init(this);
+
         typeVinCoordinateLayout = (CoordinatorLayout) findViewById(R.id.type_vin_coordinate_layout);
-
-        layoutDisappearingTransition = new LayoutTransition();
         layoutDisappearingTransition.setDuration(LayoutTransition.DISAPPEARING, 100);
-
-        layoutAppearingTransition = new LayoutTransition();
         layoutAppearingTransition.setDuration(LayoutTransition.APPEARING, 100);
 
         setupAddVehicleButton();
@@ -123,7 +121,8 @@ public class TypeVinActivity extends AppCompatActivity {
         setupKeyboardAlphaNumericKeyListeners();
         setupKeyboardCurrencyKeyListeners();
 
-        if (getIntent().getStringExtra("ScannedVin") != null) {
+        String intentExtra = getIntent().getStringExtra("ScannedVin");
+        if (intentExtra != null && !intentExtra.isEmpty()) {
             vinEditText.setText(getIntent().getStringExtra("ScannedVin"));
             priceEditText.requestFocus();
         }
@@ -150,6 +149,37 @@ public class TypeVinActivity extends AppCompatActivity {
         return activeNetworkInfo != null;
     }
 
+    private boolean passPreValidationChecks(String vin) {
+        if (vin == null || vin.isEmpty()) {
+            return false;
+        }
+        if (!isNetworkAvailable()) {
+            Snackbar.make(typeVinCoordinateLayout, "No connection", Snackbar.LENGTH_SHORT).setAction("RETRY", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    addVehicleButton.performClick();
+                }
+            }).show();
+            return false;
+        }
+        if (!new VinErrorCheck(vin).isVinLengthValid(vin)) {
+            vinTextInputLayout.setError("Enter a valid vin");
+            vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            return false;
+        }
+        if (vinExistsInRealm(vin)) {
+            vinTextInputLayout.setError("Enter a valid vin");
+            vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+            return false;
+        }
+        return true;
+    }
+
+    private boolean vinExistsInRealm(String vin) {
+        return realm.where(Vehicle.class).equalTo("vin", vin).findFirst() != null;
+    }
+
+
     /**
      *
      */
@@ -160,32 +190,10 @@ public class TypeVinActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String vin = vinEditText.getText().toString();
-
-                if (isNetworkAvailable()) {
-                    VinErrorCheck vinErrorCheck = new VinErrorCheck(vin);
-
-                    if (vinErrorCheck.verifyVinLength(vin)) {
-                        vin = vinErrorCheck.getVin();
-
-                        if (realm.where(Vehicle.class).equalTo("vin", vin).findFirst() == null) {
-                            String[] vinParams = {vin, priceEditText.getText().toString()};
-                            new VinCheckTask().execute(vinParams);
-
-                        } else {
-                            vinTextInputLayout.setError("Enter a valid vin");
-                            vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-                        }
-                    } else {
-                        vinTextInputLayout.setError("Enter a valid vin");
-                        vinEditText.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-                    }
-                } else {
-                    Snackbar.make(typeVinCoordinateLayout, "No connection", Snackbar.LENGTH_SHORT).setAction("RETRY", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            addVehicleButton.performClick();
-                        }
-                    }).show();
+                if (passPreValidationChecks(vin)) {
+                    vin = new VinErrorCheck(vin).getVin();
+                    String[] vinParams = {vin, priceEditText.getText().toString()};
+                    new VinCheckTask().execute(vinParams);
                 }
             }
         });

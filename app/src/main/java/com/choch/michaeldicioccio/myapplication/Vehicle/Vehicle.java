@@ -10,35 +10,17 @@ import io.realm.RealmObject;
 public class Vehicle extends RealmObject {
 
     /* Attributes */
-    Date buy_date;
-    Date sell_date;
-
-    String vin;
-    String year;
-    String make;
-    String model;
-    String trim;
-    String made_in;
-    String style;
-    String engine;
-    String description;
-
-    VehicleBuyer vehicleBuyer;
-
-    double price_paid;
-    double price_sold;
-
+    private Date buy_date, sell_date;
+    private String vin, year, make, model, trim, made_in, style, engine, description;
+    private VehicleBuyer vehicleBuyer;
+    private double price_paid, price_sold;
+    private boolean paid_price_set, sold_price_set, sold;
     RealmList<Expense> expenses;
-
-    boolean paid_price_set;
-    boolean sold_price_set;
-    boolean sold;
 
     /* Constructor */
     public Vehicle () {
         this.sold_price_set = false;
         this.sold = false;
-
         this.expenses = new RealmList<>();
     }
 

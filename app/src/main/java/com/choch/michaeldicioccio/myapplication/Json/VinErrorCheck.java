@@ -20,7 +20,7 @@ public class VinErrorCheck {
     /* Vin Verification */
     public boolean verifyValidVin(String barcodeFormat) {
         System.out.println(barcodeFormat);
-        if (verifyBarcodeFormat(barcodeFormat) && verifyVinLength(vin)) {
+        if (verifyBarcodeFormat(barcodeFormat) && isVinLengthValid(vin)) {
             return true;
         }
 
@@ -48,7 +48,7 @@ public class VinErrorCheck {
      * Checks on the 18 length vin and removes the first char since some have an "I"
      * Checks on the 17 length vin
      */
-    public boolean verifyVinLength(String vin) {
+    public boolean isVinLengthValid(String vin) {
         int vin_n = vin.length();
         if (vin_n == 18 && vin.substring(0, 1).equals("I")) {
             this.vin = vin.substring(1);
